@@ -27,7 +27,7 @@ class Game extends React.Component {
         let searchUrl = `${flickrSearchURL}&api_key=${FLICKR_API_KEY}&text=${keyword}&per_page=${count}`;
         console.log(searchUrl);
         let options = { mode: "cors" };
-        // searchUrl = '/test.json';
+        searchUrl = '/test.json';
         fetch(searchUrl, options)
             .then(response => response.json())
             .then(json => {
@@ -107,6 +107,7 @@ class Game extends React.Component {
             } else {
                 if (this.state.flipped1.slice(1) === id.slice(1)) {
                     this.setState((prevState) => ({ flipped1: null, flipped2: null, successFlips: prevState.successFlips + 1 }));
+                    alert('');
                 } else {
                     this.setState((prevState) => ({ flipped2: id, failureFlips: prevState.failureFlips + 1 }));
                     let flipTimeout = setTimeout(() => {
