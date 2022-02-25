@@ -1,11 +1,10 @@
 import React from "react";
 import Card from "./Card";
-import './Board.css';
 
 class Board extends React.Component {
     constructor(props) {
         super(props);
-        this.handleClick = this.handleClick.bind(this);
+        // this.handleClick = this.handleClick.bind(this);
         this.state = {
 
         };
@@ -28,7 +27,7 @@ class Board extends React.Component {
                 {
                     table.map((e, i) =>
                         <div key={i} className="row justify-content-center">
-                            {e.map(c => <Card key={c.id} id={c.id} src={c.src} flipped={c.flipped || this.props.hintOn !== null} onClick={this.handleClick} />)}
+                            {e.map(c => <Card key={c.id} id={c.id} src={c.src} flipped={c.flipped || this.props.hintOn !== null} onClick={this.handleClick.bind(this)} />)}
                         </div>
                     )
 

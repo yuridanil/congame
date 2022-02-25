@@ -1,10 +1,9 @@
 import React from "react";
-import Board from "./Board";
-// import Button from "./Button";
-import Timer from "./Timer";
-
 import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap';
+import Board from "./Board";
+import Timer from "./Timer";
 import MyModal from "./MyModal";
+
 
 // TODO: add comments
 class Game extends React.Component {
@@ -17,10 +16,11 @@ class Game extends React.Component {
             mode: 0,
             colsCount: "4",
             rowsCount: "3",
-            searchKeyword: "monkeys",
+            searchKeyword: "cats",
             cards: [],
             winModal: false,
-            stopModal: false
+            stopModal: false,
+            errorMessage: null
         };
     }
 
@@ -28,9 +28,8 @@ class Game extends React.Component {
         let flickrSearchURL = "https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=1&sort=interestingness-desc&page=1&extras=url_q";
         let FLICKR_API_KEY = "c82dd287a39769d612a519299ad58bd0";
         let searchUrl = `${flickrSearchURL}&api_key=${FLICKR_API_KEY}&text=${keyword}&per_page=${count}`;
-        console.log(searchUrl);
         let options = { mode: "cors" };
-        // searchUrl = '/test.json';
+        // searchUrl = '/test.json'; // test
         fetch(searchUrl, options)
             .then(response => response.json())
             .then(json => {
@@ -39,11 +38,11 @@ class Game extends React.Component {
                         mode: 2, cards: json.photos.photo
                             .slice(0, count) // cut if result contains more elements
                             .flatMap(e => [{ id: `1${e.id}`, src: e.url_q, flipped: 0 }, { id: `2${e.id}`, src: e.url_q, flipped: 0 }]) // map to cards
-                            .sort(() => .5 - Math.random())
+                            .sort(() => .5 - Math.random()) // shuffle
                     }));
                 } else {
                     this.setState({ mode: 0 });
-                    alert(`Error loading images: result:${json.stat} count:${json.photos.photo.length}`); // TODO: change to toast
+                    this.setState({ errorMessage: `Error loading images. Result: ${json.stat}, count: ${json.photos.photo.length}` });
                 }
             });
     }
@@ -54,12 +53,12 @@ class Game extends React.Component {
         let cols = this.state.colsCount;
         let rows = this.state.rowsCount;
         if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 8 || rows > 5) {
-            alert("The number of cards must be even. Min size: 2x2. Max size: 8x5. Change the number of columns or rows");
+            this.setState({ errorMessage: "The number of cards must be even. Min size: 2x2. Max size: 8x5. Change the number of columns or rows" });
         }
         else {
-            this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null });
+            this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
             this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2);
-            //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300);
+            //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300); //test
         }
     }
 
@@ -81,10 +80,14 @@ class Game extends React.Component {
         }
     }
 
+    handleShuffleClick() {
+        this.setState((prevState) => ({ cards: prevState.cards.sort(() => .5 - Math.random()) }));
+    }
+
     handleInputChange(event) {
         const value = event.target.value;
         const name = event.target.name;
-        this.setState({ [name]: value });
+        this.setState({ [name]: value, cards: [] });
     }
 
     setFlipped(id, flipped) {
@@ -111,7 +114,7 @@ class Game extends React.Component {
                 this.setState({ flipped1: id });
             } else {
                 if (this.state.flipped1.slice(1) === id.slice(1)) {
-                    this.setState((prevState) => ({ flipped1: null, flipped2: null}));
+                    this.setState((prevState) => ({ flipped1: null, flipped2: null }));
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) {
                         this.setState({ mode: 3, winModal: true });
@@ -149,7 +152,7 @@ class Game extends React.Component {
                         <Col xs="auto">
                             <InputGroup>
                                 <InputGroup.Text>Board size:</InputGroup.Text>
-                                <FormControl name="colsCount" xs="auto" placeholder="Columns" min="2" max="8" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
+                                <FormControl name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
                                 <InputGroup.Text>&#215;</InputGroup.Text>
                                 <FormControl name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)} />
                                 <InputGroup.Text>Keyword:</InputGroup.Text>
@@ -169,10 +172,14 @@ class Game extends React.Component {
                         <Col xs="auto">
                             <Button onClick={this.handleHintClick.bind(this)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
                         </Col>
+                        <Col xs="auto">
+                            <Button onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
+                        </Col>
                     </Row>
                 }
 
                 <Row className="m-2 align-items-center justify-content-center">
+                    {mode === 0 && this.state.errorMessage && <p className="text-danger">{this.state.errorMessage}</p>}
                     {mode === 1 && `Loading images...`}
                     {mode === 2 && <Timer />}
                     {mode === 3 && `Win!`}
@@ -182,8 +189,8 @@ class Game extends React.Component {
                     <Board cards={this.state.cards} cols={parseInt(this.state.colsCount)} rows={parseInt(this.state.rowsCount)} hintOn={this.state.hintOn} onClick={this.handleCardClick.bind(this)} />
                 }
 
-                <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)}/>
-                <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)}/>
+                <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)} />
+                <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
 
             </Form>
         );
