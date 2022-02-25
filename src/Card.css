@@ -3,8 +3,9 @@
     border-radius: 0.25rem;
     width: 96px;
     height: 96px;
-    box-shadow: 1px 1px 2px 2px #c2c2c2;
+    box-shadow: 1px 1px 2px 1px #c2c2c2;
     background-repeat: no-repeat;
     background-color: #eeeeee;
     cursor: pointer;
+    margin: 0.25rem;
 }

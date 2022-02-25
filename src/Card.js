@@ -20,7 +20,7 @@ class Card extends React.Component {
         };
 
         return (
-            <div className="col-auto">
+            <div className="col-sm-auto nopadding">
                 <div className="Card" id={this.props.id} style={myStyle} onClick={this.handleClick.bind(this)}>
                 </div>
             </div>

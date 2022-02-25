@@ -15,8 +15,8 @@ class Game extends React.Component {
         super(props);
         this.state = {
             mode: 0,
-            colsCount: "2",
-            rowsCount: "2",
+            colsCount: "4",
+            rowsCount: "3",
             searchKeyword: "monkeys",
             cards: [],
             winModal: false,
@@ -30,7 +30,7 @@ class Game extends React.Component {
         let searchUrl = `${flickrSearchURL}&api_key=${FLICKR_API_KEY}&text=${keyword}&per_page=${count}`;
         console.log(searchUrl);
         let options = { mode: "cors" };
-        searchUrl = '/test.json';
+        // searchUrl = '/test.json';
         fetch(searchUrl, options)
             .then(response => response.json())
             .then(json => {
@@ -58,8 +58,8 @@ class Game extends React.Component {
         }
         else {
             this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null });
-            //this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2);
-            setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300);
+            this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2);
+            //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300);
         }
     }
 
@@ -183,7 +183,7 @@ class Game extends React.Component {
                 }
 
                 <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)}/>
-                <MyModal id={1} show={this.state.stopModal} yes="OK" no="Cancel" title="Caution!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)}/>
+                <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)}/>
 
             </Form>
         );
