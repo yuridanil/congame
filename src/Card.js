@@ -4,7 +4,6 @@ import './Card.css';
 class Card extends React.Component {
     constructor(props) {
         super(props);
-        this.handleClick = this.handleClick.bind(this);
         this.state = {
 
         };
@@ -17,11 +16,13 @@ class Card extends React.Component {
     render() {
         const myStyle = {
             backgroundImage: `url('${this.props.src}')`,
-            backgroundSize: this.props.flipped ?  "contain" : "0px 0px"
+            backgroundSize: this.props.flipped ? "contain" : "0px 0px"
         };
 
         return (
-            <div className="Card" id={this.props.id} style={myStyle} onClick={this.handleClick}>
+            <div className="col-auto">
+                <div className="Card" id={this.props.id} style={myStyle} onClick={this.handleClick.bind(this)}>
+                </div>
             </div>
         );
     }

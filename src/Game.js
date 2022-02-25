@@ -4,17 +4,23 @@ import Board from "./Board";
 import Timer from "./Timer";
 
 import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap';
+import MyModal from "./MyModal";
 
 // TODO: add comments
 class Game extends React.Component {
+    successFlips = 0;
+    failureFlips = 0;
+
     constructor(props) {
         super(props);
         this.state = {
             mode: 0,
-            colsCount: "4",
-            rowsCount: "3",
+            colsCount: "2",
+            rowsCount: "2",
             searchKeyword: "monkeys",
             cards: [],
+            winModal: false,
+            stopModal: false
         };
     }
 
@@ -43,20 +49,22 @@ class Game extends React.Component {
     }
 
     handlePlayClick() {
-        let cardsCount = this.state.colsCount * this.state.rowsCount;
-        if (cardsCount % 2 > 0 || cardsCount < 4 || cardsCount > 64) {
-            alert("The number of cards must be even and between 4 and 64. Change the number of columns or rows");
+        this.successFlips = 0;
+        this.failureFlips = 0;
+        let cols = this.state.colsCount;
+        let rows = this.state.rowsCount;
+        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 8 || rows > 5) {
+            alert("The number of cards must be even. Min size: 2x2. Max size: 8x5. Change the number of columns or rows");
         }
         else {
-            this.setState({ mode: 1, hintCount: 3, successFlips: 0, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null });
+            this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null });
             //this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2);
-            setTimeout(() => this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2), 1300);
+            setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300);
         }
     }
 
     handleStopClick() {
-        this.setState({ mode: 0 });
-        //        console.log(this.state);
+        this.setState({ stopModal: true });
     }
 
     handleHintClick() {
@@ -103,10 +111,14 @@ class Game extends React.Component {
                 this.setState({ flipped1: id });
             } else {
                 if (this.state.flipped1.slice(1) === id.slice(1)) {
-                    this.setState((prevState) => ({ flipped1: null, flipped2: null, successFlips: prevState.successFlips + 1 }));
-                    alert('');
+                    this.setState((prevState) => ({ flipped1: null, flipped2: null}));
+                    this.successFlips++;
+                    if (this.successFlips === cards.length / 2) {
+                        this.setState({ mode: 3, winModal: true });
+                    }
                 } else {
-                    this.setState((prevState) => ({ flipped2: id, failureFlips: prevState.failureFlips + 1 }));
+                    this.failureFlips++;
+                    this.setState((prevState) => ({ flipped2: id }));
                     let flipTimeout = setTimeout(() => {
                         this.setFlipped(this.state.flipped1, false);
                         this.setFlipped(this.state.flipped2, false);
@@ -115,6 +127,15 @@ class Game extends React.Component {
                 }
             }
         }
+    }
+
+    handleYes(id) {
+        id === 1 && this.setState({ mode: 0, stopModal: false });
+    }
+
+    handleNo(id) {
+        id === 0 && this.setState({ mode: 3, winModal: false });
+        id === 1 && this.setState({ stopModal: false });
     }
 
     render() {
@@ -128,7 +149,7 @@ class Game extends React.Component {
                         <Col xs="auto">
                             <InputGroup>
                                 <InputGroup.Text>Board size:</InputGroup.Text>
-                                <FormControl name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
+                                <FormControl name="colsCount" xs="auto" placeholder="Columns" min="2" max="8" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
                                 <InputGroup.Text>&#215;</InputGroup.Text>
                                 <FormControl name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)} />
                                 <InputGroup.Text>Keyword:</InputGroup.Text>
@@ -154,12 +175,15 @@ class Game extends React.Component {
                 <Row className="m-2 align-items-center justify-content-center">
                     {mode === 1 && `Loading images...`}
                     {mode === 2 && <Timer />}
-                    {mode === 3 && `Congrats, you won! Stats: 123`}
+                    {mode === 3 && `Win!`}
                 </Row>
 
                 {(mode === 2 || mode === 3) &&
-                    <Board cards={this.state.cards} cols={this.state.colsCount} rows={this.state.rowsCount} hintOn={this.state.hintOn} onClick={this.handleCardClick.bind(this)} />
+                    <Board cards={this.state.cards} cols={parseInt(this.state.colsCount)} rows={parseInt(this.state.rowsCount)} hintOn={this.state.hintOn} onClick={this.handleCardClick.bind(this)} />
                 }
+
+                <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)}/>
+                <MyModal id={1} show={this.state.stopModal} yes="OK" no="Cancel" title="Caution!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)}/>
 
             </Form>
         );
