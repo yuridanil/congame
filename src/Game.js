@@ -4,8 +4,6 @@ import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
 
-
-// TODO: add comments
 class Game extends React.Component {
     successFlips = 0;
     failureFlips = 0;
@@ -52,7 +50,7 @@ class Game extends React.Component {
         this.failureFlips = 0;
         let cols = this.state.colsCount;
         let rows = this.state.rowsCount;
-        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 8 || rows > 5) {
+        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 8 || rows > 5) { // check input
             this.setState({ errorMessage: "The number of cards must be even. Min size: 2x2. Max size: 8x5. Change the number of columns or rows" });
         }
         else {
@@ -69,11 +67,11 @@ class Game extends React.Component {
     handleHintClick() {
         if (this.state.hintCount > 0) {
             let hintTimeout = setTimeout(() => {
-                this.setState({
+                this.setState({ // flip cards back
                     hintOn: null
                 });
             }, 1000);
-            this.setState((prevState) => ({
+            this.setState((prevState) => ({ // flip cards
                 hintCount: prevState.hintCount - 1,
                 hintOn: hintTimeout
             }));
@@ -93,7 +91,7 @@ class Game extends React.Component {
     setFlipped(id, flipped) {
         let cards = this.state.cards;
         let i = cards.findIndex(e => e.id === id);
-        this.setState(({ cards }) => ({
+        this.setState(({ cards }) => ({ // set specified card flipped
             cards: [
                 ...cards.slice(0, i),
                 {
@@ -108,21 +106,21 @@ class Game extends React.Component {
     handleCardClick(id) {
         let cards = this.state.cards;
         let card = cards.find(e => e.id === id);
-        if (!card.flipped && this.state.flipped2 === null && this.state.hintOn === null) {
+        if (!card.flipped && this.state.flipped2 === null && this.state.hintOn === null) { // card not flipped and only one flipped yet in pair
             this.setFlipped(id, true);
-            if (this.state.flipped1 === null) {
+            if (this.state.flipped1 === null) { // this is 1st card
                 this.setState({ flipped1: id });
-            } else {
-                if (this.state.flipped1.slice(1) === id.slice(1)) {
+            } else { // this is 2nd card
+                if (this.state.flipped1.slice(1) === id.slice(1)) { // matching cards
                     this.setState((prevState) => ({ flipped1: null, flipped2: null }));
                     this.successFlips++;
-                    if (this.successFlips === cards.length / 2) {
+                    if (this.successFlips === cards.length / 2) { // game over
                         this.setState({ mode: 3, winModal: true });
                     }
-                } else {
+                } else { // not matching cards
                     this.failureFlips++;
                     this.setState((prevState) => ({ flipped2: id }));
-                    let flipTimeout = setTimeout(() => {
+                    let flipTimeout = setTimeout(() => { // flip not matching cards after 1 sec
                         this.setFlipped(this.state.flipped1, false);
                         this.setFlipped(this.state.flipped2, false);
                         this.setState({ flipped1: null, flipped2: null });
