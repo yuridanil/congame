@@ -1,23 +1,20 @@
 import React from "react";
 import Board from "./Board";
-import Button from "./Button";
+// import Button from "./Button";
 import Timer from "./Timer";
+
+import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap';
 
 // TODO: add comments
 class Game extends React.Component {
     constructor(props) {
         super(props);
-        this.handlePlayClick = this.handlePlayClick.bind(this);
-        this.handleStopClick = this.handleStopClick.bind(this);
-        this.handleHintClick = this.handleHintClick.bind(this);
-        this.handleCardClick = this.handleCardClick.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
         this.state = {
             mode: 0,
             colsCount: "4",
             rowsCount: "3",
             searchKeyword: "monkeys",
-            cards: []
+            cards: [],
         };
     }
 
@@ -52,14 +49,14 @@ class Game extends React.Component {
         }
         else {
             this.setState({ mode: 1, hintCount: 3, successFlips: 0, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null });
-            this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2);
-            //setTimeout(() => this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2), 300);
+            //this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2);
+            setTimeout(() => this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2), 1300);
         }
     }
 
     handleStopClick() {
         this.setState({ mode: 0 });
-//        console.log(this.state);
+        //        console.log(this.state);
     }
 
     handleHintClick() {
@@ -123,38 +120,48 @@ class Game extends React.Component {
     render() {
         const mode = this.state.mode;
         return (
-            <div className="Game">
-                <h2>Concentration Game</h2>
-                <h5>Find two cards that match to win the cards</h5>
-                <div>
-                    {(mode === 0 || mode === 3 || mode === 1) &&
-                        <>
-                            <span>
-                                Board size: <input name="colsCount" placeholder="Columns" value={this.state.colsCount} onChange={this.handleInputChange} />
-                                x<input name="rowsCount" placeholder="Rows" value={this.state.rowsCount} onChange={this.handleInputChange} />
-                            </span>
-                            <span>Keyword:<input name="searchKeyword" placeholder="Keyword" value={this.state.searchKeyword} onChange={this.handleInputChange} /></span>
-                            <Button caption="Play" onClick={this.handlePlayClick} />
-                        </>
-                    }
+            <Form>
+                <Row className="m-2 justify-content-center"><b>Concentration Game</b></Row>
+                <Row className="m-2 justify-content-center">Find two cards that match to win the cards</Row>
+                {(mode === 0 || mode === 3 || mode === 1) &&
+                    <Row className="m-2 align-items-center justify-content-center">
+                        <Col xs="auto">
+                            <InputGroup>
+                                <InputGroup.Text>Board size:</InputGroup.Text>
+                                <FormControl name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
+                                <InputGroup.Text>&#215;</InputGroup.Text>
+                                <FormControl name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)} />
+                                <InputGroup.Text>Keyword:</InputGroup.Text>
+                                <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
+                            </InputGroup>
+                        </Col>
+                        <Col xs="auto">
+                            <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
+                        </Col>
+                    </Row>
+                }
+                {mode === 2 &&
+                    <Row className="m-2 align-items-center justify-content-center">
+                        <Col xs="auto">
+                            <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
+                        </Col>
+                        <Col xs="auto">
+                            <Button onClick={this.handleHintClick.bind(this)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
+                        </Col>
+                    </Row>
+                }
 
-                    {mode === 2 &&
-                        <>
-                            <Button caption="Stop" onClick={this.handleStopClick} />
-                            <Button caption="Hint" onClick={this.handleHintClick} counter={this.state.hintCount} disabled={this.state.hintCount === 0 || this.state.hintOn !== null} />
-                        </>
-                    }
-                    <div>
-                        {mode === 1 && `Loading images...`}
-                        {mode === 2 && <Timer />}
-                        {mode === 3 && `Congrats, you won! Stats: 123`}
-                    </div>
-                    {(mode === 2 || mode === 3) &&
-                        <Board cards={this.state.cards} cols={this.state.colsCount} rows={this.state.rowsCount} hintOn={this.state.hintOn} onClick={this.handleCardClick} />
-                    }
-                </div>
-                <p></p>
-            </div>
+                <Row className="m-2 align-items-center justify-content-center">
+                    {mode === 1 && `Loading images...`}
+                    {mode === 2 && <Timer />}
+                    {mode === 3 && `Congrats, you won! Stats: 123`}
+                </Row>
+
+                {(mode === 2 || mode === 3) &&
+                    <Board cards={this.state.cards} cols={this.state.colsCount} rows={this.state.rowsCount} hintOn={this.state.hintOn} onClick={this.handleCardClick.bind(this)} />
+                }
+
+            </Form>
         );
     }
 }
