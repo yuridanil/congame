@@ -23,7 +23,7 @@ class Board extends React.Component {
                         return i1 % cols === 0 ? cards.slice(i1, i1 + cols) : null;
                     }).filter(e2 => { return e2; })
                         .map((e, i) => // map to cards in rows
-                            <div key={i} className="row justify-content-center">
+                            <div key={i} className="row justify-content-center flex-nowrap">
                                 {e.map(c => <Card key={c.id} id={c.id} src={c.src} flipped={c.flipped || this.props.hintOn !== null} onClick={this.handleClick.bind(this)} />)}
                             </div>
                         )
