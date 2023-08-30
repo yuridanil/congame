@@ -124,6 +124,7 @@ class Game extends React.Component {
                         this.setFlipped(this.state.flipped1, false);
                         this.setFlipped(this.state.flipped2, false);
                         this.setState({ flipped1: null, flipped2: null });
+                        clearTimeout(flipTimeout);
                     }, 1000);
                 }
             }

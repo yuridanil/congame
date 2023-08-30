@@ -17,7 +17,6 @@ class Board extends React.Component {
     render() {
         const cards = this.props.cards;
         const cols = this.props.cols;
-        const rows = this.props.rows;
         return (
 
             <div className="board" style={{ gridTemplateColumns: "auto ".repeat(cols) }}>
