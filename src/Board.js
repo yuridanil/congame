@@ -1,5 +1,6 @@
 import React from "react";
 import Card from "./Card";
+import './Board.css';
 
 class Board extends React.Component {
     constructor(props) {
@@ -16,20 +17,16 @@ class Board extends React.Component {
     render() {
         const cards = this.props.cards;
         const cols = this.props.cols;
+        const rows = this.props.rows;
         return (
-            <div className="container">
+
+            <div className="board" style={{ gridTemplateColumns: "auto ".repeat(cols) }}>
                 {
-                    cards.map((e1, i1) => { // group to rows
-                        return i1 % cols === 0 ? cards.slice(i1, i1 + cols) : null;
-                    }).filter(e2 => { return e2; })
-                        .map((e, i) => // map to cards in rows
-                            <div key={i} className="row justify-content-center flex-nowrap">
-                                {e.map(c => <Card key={c.id} id={c.id} src={c.src} flipped={c.flipped || this.props.hintOn !== null} onClick={this.handleClick.bind(this)} />)}
-                            </div>
-                        )
+                    cards.map((c, i) => // map to cards in rows
+                        <Card key={c.id} id={c.id} src={c.src} flipped={c.flipped || this.props.hintOn !== null} onClick={this.handleClick.bind(this)} />
+                    )
                 }
             </div>
-
         );
     }
 }

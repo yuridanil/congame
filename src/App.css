@@ -1,5 +1,19 @@
+#root, .App {
+    height: 100%;
+}
+
 .App {
+  display: flex;
+  flex-direction: column;
   text-align: center;
+  align-content: stretch;
+  justify-content: stretch;
+}
+
+.cgform {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
 }
 
 .App-logo {
@@ -41,3 +55,4 @@
   padding: 0 !important;
   margin: 0 !important;
 }
+

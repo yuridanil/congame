@@ -15,14 +15,12 @@ class Card extends React.Component {
 
     render() {
         const myStyle = {
-            backgroundImage: `url('${this.props.src}')`,
-            backgroundSize: this.props.flipped ? "contain" : "0px 0px"
+            opacity: this.props.flipped ? 1 : 0
         };
 
         return (
-            <div className="col-sm-auto nopadding">
-                <div className="Card" id={this.props.id} style={myStyle} onClick={this.handleClick.bind(this)}>
-                </div>
+            <div className="Card" id={this.props.id} onClick={this.handleClick.bind(this)}>
+                <img alt="" src={this.props.src} style={myStyle}/>
             </div>
         );
     }

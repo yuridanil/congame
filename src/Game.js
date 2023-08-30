@@ -23,7 +23,7 @@ class Game extends React.Component {
     }
 
     loadImages(keyword, count) {
-        let flickrSearchURL = "https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=1&sort=interestingness-desc&page=1&extras=url_q";
+        let flickrSearchURL = "https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=1&sort=interestingness-desc&page=1&extras=url_w";
         let FLICKR_API_KEY = "c82dd287a39769d612a519299ad58bd0";
         let searchUrl = `${flickrSearchURL}&api_key=${FLICKR_API_KEY}&text=${keyword}&per_page=${count}`;
         let options = { mode: "cors" };
@@ -35,7 +35,7 @@ class Game extends React.Component {
                     this.setState((prevState) => ({
                         mode: 2, cards: json.photos.photo
                             .slice(0, count) // cut if result contains more elements
-                            .flatMap(e => [{ id: `1${e.id}`, src: e.url_q, flipped: 0 }, { id: `2${e.id}`, src: e.url_q, flipped: 0 }]) // map to cards
+                            .flatMap(e => [{ id: `1${e.id}`, src: e.url_w, flipped: 0 }, { id: `2${e.id}`, src: e.url_w, flipped: 0 }]) // map to cards
                             .sort(() => .5 - Math.random()) // shuffle
                     }));
                 } else {
@@ -50,8 +50,8 @@ class Game extends React.Component {
         this.failureFlips = 0;
         let cols = this.state.colsCount;
         let rows = this.state.rowsCount;
-        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 8 || rows > 5) { // check input
-            this.setState({ errorMessage: "The number of cards must be even. Min size: 2x2. Max size: 8x5. Change the number of columns or rows" });
+        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 25 || rows > 20) { // check input
+            this.setState({ errorMessage: "The number of cards must be even. Min size: 2x2. Max size: 25x20. Change the number of columns or rows" });
         }
         else {
             this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
@@ -142,55 +142,62 @@ class Game extends React.Component {
     render() {
         const mode = this.state.mode;
         return (
-            <Form>
-                <Row className="m-2 justify-content-center"><b>Concentration Game</b></Row>
-                <Row className="m-2 justify-content-center">Find two cards that match to win the cards</Row>
-                {(mode === 0 || mode === 3 || mode === 1) &&
-                    <Row className="m-2 align-items-center justify-content-center">
-                        <Col xs="auto">
-                            <InputGroup>
-                                <InputGroup.Text>Board size:</InputGroup.Text>
-                                <FormControl name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
-                                <InputGroup.Text>&#215;</InputGroup.Text>
-                                <FormControl name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)} />
-                                <InputGroup.Text>Keyword:</InputGroup.Text>
-                                <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
-                            </InputGroup>
-                        </Col>
-                        <Col xs="auto">
-                            <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
-                        </Col>
-                    </Row>
-                }
-                {mode === 2 &&
-                    <Row className="m-2 align-items-center justify-content-center">
-                        <Col xs="auto">
-                            <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
-                        </Col>
-                        <Col xs="auto">
-                            <Button onClick={this.handleHintClick.bind(this)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
-                        </Col>
-                        <Col xs="auto">
-                            <Button onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
-                        </Col>
-                    </Row>
-                }
+            <>
+                <Form className="cgform">
+                    {(mode === 0 || mode === 3 || mode === 1) &&
+                        <>
+                            <Row className="m-2 justify-content-center"><b>Concentration Game</b></Row>
+                            <Row className="m-2 justify-content-center">Find two cards that match to win the cards</Row>
+                            <Row className="m-2 align-items-center justify-content-center">
+                                <Col xs="auto">
+                                    <InputGroup>
+                                        <InputGroup.Text>Board size:</InputGroup.Text>
+                                        <FormControl name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
+                                        <InputGroup.Text>&#215;</InputGroup.Text>
+                                        <FormControl name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)} />
+                                    </InputGroup>
+                                    <InputGroup>
+                                        <InputGroup.Text>Keyword:</InputGroup.Text>
+                                        <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
+                                    </InputGroup>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
+                                </Col>
+                            </Row>
+                        </>
+                    }
+                    {mode === 2 &&
+                        <Row className="m-2 align-items-center justify-content-center">
+                            <Col xs="auto">
+                                <Timer />
+                            </Col>
+                            <Col xs="auto">
+                                <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
+                            </Col>
+                            <Col xs="auto">
+                                <Button onClick={this.handleHintClick.bind(this)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
+                            </Col>
+                            <Col xs="auto">
+                                <Button onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
+                            </Col>
+                        </Row>
+                    }
+                    {(mode === 0 || mode === 1 || mode === 3) &&
+                        <Row className="m-2 align-items-center justify-content-center">
+                            {mode === 0 && this.state.errorMessage && <p className="text-danger">{this.state.errorMessage}</p>}
+                            {mode === 1 && `Loading images...`}
+                            {mode === 3 && `Win!`}
+                        </Row>
+                    }
+                    <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)} />
+                    <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
 
-                <Row className="m-2 align-items-center justify-content-center">
-                    {mode === 0 && this.state.errorMessage && <p className="text-danger">{this.state.errorMessage}</p>}
-                    {mode === 1 && `Loading images...`}
-                    {mode === 2 && <Timer />}
-                    {mode === 3 && `Win!`}
-                </Row>
-
+                </Form>
                 {(mode === 2 || mode === 3) &&
                     <Board cards={this.state.cards} cols={parseInt(this.state.colsCount)} rows={parseInt(this.state.rowsCount)} hintOn={this.state.hintOn} onClick={this.handleCardClick.bind(this)} />
                 }
-
-                <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)} />
-                <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
-
-            </Form>
+            </>
         );
     }
 }
