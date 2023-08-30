@@ -148,7 +148,7 @@ class Game extends React.Component {
                     {(mode === 0 || mode === 3 || mode === 1) &&
                         <>
                             <Row className="m-2 justify-content-center"><b>Concentration Game</b></Row>
-                            <Row className="m-2 justify-content-center">Find two cards that match to win the cards</Row>
+                            <Row className="m-2 justify-content-center">Find two cards that match to win the Game</Row>
                             <Row className="m-2 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup>
