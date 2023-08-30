@@ -3,6 +3,7 @@ import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
+import { ANIMALS } from './Animals';
 
 class Game extends React.Component {
     successFlips = 0;
@@ -13,8 +14,8 @@ class Game extends React.Component {
         this.state = {
             mode: 0,
             colsCount: "4",
-            rowsCount: "3",
-            searchKeyword: "cats",
+            rowsCount: "4",
+            searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             cards: [],
             winModal: false,
             stopModal: false,
