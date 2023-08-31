@@ -36,11 +36,11 @@ class Game extends React.Component {
                     .flatMap((e, i) => [{
                         id: `1ltr${i}`,
                         flipped: 0,
-                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="lightgray" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="rgb(235, 235, 235)" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
                     }, {
                         id: `2ltr${i}`,
                         flipped: 0,
-                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="lightgray" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="rgb(235, 235, 235)" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
                     }])
                     .sort(() => .5 - Math.random()) // shuffle
                     ;
