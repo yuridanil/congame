@@ -249,7 +249,6 @@ class Game extends React.Component {
                         <Row className="m-1 align-items-center justify-content-center">
                             {mode === 0 && this.state.errorMessage && <p className="text-danger">{this.state.errorMessage}</p>}
                             {mode === 1 && `Loading images...`}
-                            {mode === 3 && `Win!`}
                         </Row>
                     }
                     <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)} />
