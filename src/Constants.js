@@ -65,6 +65,7 @@ export const ANIMALS = [
 ];
 
 export const SIZES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+
 export const ENGLISH_LETTERS = [
     'A',
     'B',
@@ -131,5 +132,30 @@ export const RUSSIAN_LETTERS = [
 ];
 
 export const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+export const SYMBOLS = [
+    '~',
+    '!',
+    '@',
+    '%23',
+    '$',
+    '%',
+    '^',
+    '&amp;',
+    '*',
+    '(',
+    ')',
+    '{',
+    '}',
+    '[',
+    ']',
+    '+',
+    '-',
+    '/',
+    '*',
+    '=',
+    '&gt;',
+    '&lt;'
+];
 
 export const BASE_COLORS = ['red', 'green', 'blue', 'orange', 'magenta', 'cyan', 'black', 'gray', 'indigo', 'aqua', 'brown', 'lime'];

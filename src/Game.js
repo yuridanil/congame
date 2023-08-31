@@ -3,7 +3,7 @@ import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { ANIMALS, SIZES, BASE_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS } from './Constants';
+import { ANIMALS, SIZES, BASE_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS } from './Constants';
 import { cartesian } from "./Utils";
 
 class Game extends React.Component {
@@ -30,17 +30,18 @@ class Game extends React.Component {
             case '#1':
             case '#2':
             case '#3':
-                let symbols = cartesian(keyword === '#1' ? ENGLISH_LETTERS : keyword === '#2' ? RUSSIAN_LETTERS : NUMBERS, BASE_COLORS)
+            case '#4':
+                let symbols = cartesian(keyword === '#1' ? ENGLISH_LETTERS : keyword === '#2' ? RUSSIAN_LETTERS : keyword === '#3' ? NUMBERS : SYMBOLS, BASE_COLORS)
                     .sort(() => .5 - Math.random()) // choose random color letters
                     .slice(0, count) // cut if result contains more elements
                     .flatMap((e, i) => [{
                         id: `1ltr${i}`,
                         flipped: 0,
-                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="rgb(235, 235, 235)" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
                     }, {
                         id: `2ltr${i}`,
                         flipped: 0,
-                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="rgb(235, 235, 235)" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
                     }])
                     .sort(() => .5 - Math.random()) // shuffle
                     ;
@@ -89,6 +90,7 @@ class Game extends React.Component {
                 case '1':
                 case '2':
                 case '3':
+                case '4':
                     keyword = `#${this.state.imageType}`
                     break;
                 default:
@@ -103,13 +105,13 @@ class Game extends React.Component {
         this.setState({ stopModal: true });
     }
 
-    handleHintClick() {
+    handleHintClick(duration) {
         if (this.state.hintCount > 0) {
             let hintTimeout = setTimeout(() => {
                 this.setState({ // flip cards back
                     hintOn: null
                 });
-            }, 1000);
+            }, duration);
             this.setState((prevState) => ({ // flip cards
                 hintCount: prevState.hintCount - 1,
                 hintOn: hintTimeout
@@ -186,9 +188,9 @@ class Game extends React.Component {
                 <Form className="cgform">
                     {(mode === 0 || mode === 3 || mode === 1) &&
                         <>
-                            <Row className="m-2 justify-content-center"><b>Concentration Game</b></Row>
-                            <Row className="m-2 justify-content-center">Find two cards that match to win the Game</Row>
-                            <Row className="m-2 align-items-center justify-content-center">
+                            <Row className="m-1 justify-content-center"><b>Concentration Game</b></Row>
+                            <Row className="m-1 justify-content-center">Find two cards that match to win the Game</Row>
+                            <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup>
                                         <InputGroup.Text>Board size:</InputGroup.Text>
@@ -200,18 +202,27 @@ class Game extends React.Component {
                                             {SIZES.map((e) => <option key={e} value={e}>{e}</option>)}
                                         </Form.Select>
                                     </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="m-1 align-items-center justify-content-center">
+
+                                <Col xs="auto">
                                     <InputGroup>
                                         <Form.Select aria-label="Source" name="imageType" xs="auto" value={this.state.imageType} onChange={this.handleInputChange.bind(this)}>
                                             <option key='imagetype0' value='0'>Keyword</option>
-                                            <option key='imagetype1' value='1'>English letters</option>
-                                            <option key='imagetype2' value='2'>Russian letters</option>
-                                            <option key='imagetype3' value='3'>Numbers</option>
+                                            <option key='imagetype1' value='1'>English letters (A, B, C)</option>
+                                            <option key='imagetype2' value='2'>Russian letters (А, Б, В)</option>
+                                            <option key='imagetype3' value='3'>Numbers (1, 2, 3)</option>
+                                            <option key='imagetype4' value='4'>Symbols (&, @, $)</option>
                                         </Form.Select>
                                         {this.state.imageType === '0' &&
                                             <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
                                         }
                                     </InputGroup>
                                 </Col>
+
+                            </Row>
+                            <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
                                 </Col>
@@ -219,7 +230,7 @@ class Game extends React.Component {
                         </>
                     }
                     {mode === 2 &&
-                        <Row className="m-2 align-items-center justify-content-center">
+                        <Row className="m-1 align-items-center justify-content-center">
                             <Col xs="auto">
                                 <Timer />
                             </Col>
@@ -227,7 +238,7 @@ class Game extends React.Component {
                                 <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={this.handleHintClick.bind(this)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
+                                <Button onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
                             </Col>
                             <Col xs="auto">
                                 <Button onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
@@ -235,7 +246,7 @@ class Game extends React.Component {
                         </Row>
                     }
                     {(mode === 0 || mode === 1 || mode === 3) &&
-                        <Row className="m-2 align-items-center justify-content-center">
+                        <Row className="m-1 align-items-center justify-content-center">
                             {mode === 0 && this.state.errorMessage && <p className="text-danger">{this.state.errorMessage}</p>}
                             {mode === 1 && `Loading images...`}
                             {mode === 3 && `Win!`}
@@ -243,7 +254,6 @@ class Game extends React.Component {
                     }
                     <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)} />
                     <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
-
                 </Form>
                 {(mode === 2 || mode === 3) &&
                     <Board cards={this.state.cards} cols={parseInt(this.state.colsCount)} rows={parseInt(this.state.rowsCount)} hintOn={this.state.hintOn} onClick={this.handleCardClick.bind(this)} />
