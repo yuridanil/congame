@@ -1,9 +1,9 @@
 import React from "react";
-import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap';
+import { Button, Row, Col, FormControl, Form, InputGroup, FormCheck } from 'react-bootstrap';
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { ANIMALS } from './Animals';
+import { ANIMALS, SIZES } from './Constants';
 
 class Game extends React.Component {
     successFlips = 0;
@@ -51,8 +51,8 @@ class Game extends React.Component {
         this.failureFlips = 0;
         let cols = this.state.colsCount;
         let rows = this.state.rowsCount;
-        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 25 || rows > 20) { // check input
-            this.setState({ errorMessage: "The number of cards must be even. Min size: 2x2. Max size: 25x20. Change the number of columns or rows" });
+        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 16 || rows > 16) { // check input
+            this.setState({ errorMessage: "The number of cards must be even" });
         }
         else {
             this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
@@ -154,9 +154,13 @@ class Game extends React.Component {
                                 <Col xs="auto">
                                     <InputGroup>
                                         <InputGroup.Text>Board size:</InputGroup.Text>
-                                        <FormControl name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)} />
+                                        <Form.Select aria-label="Columns" name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)}>
+                                            {SIZES.map((e) => <option key={e} value={e}>{e}</option>)}
+                                        </Form.Select>
                                         <InputGroup.Text>&#215;</InputGroup.Text>
-                                        <FormControl name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)} />
+                                        <Form.Select aria-label="Columns" name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)}>
+                                            {SIZES.map((e) => <option key={e} value={e}>{e}</option>)}
+                                        </Form.Select>
                                     </InputGroup>
                                     <InputGroup>
                                         <InputGroup.Text>Keyword:</InputGroup.Text>
