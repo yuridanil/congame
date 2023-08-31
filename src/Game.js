@@ -1,9 +1,10 @@
 import React from "react";
-import { Button, Row, Col, FormControl, Form, InputGroup, FormCheck } from 'react-bootstrap';
+import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap';
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { ANIMALS, SIZES } from './Constants';
+import { ANIMALS, SIZES, BASE_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS } from './Constants';
+import { cartesian } from "./Utils";
 
 class Game extends React.Component {
     successFlips = 0;
@@ -16,6 +17,7 @@ class Game extends React.Component {
             colsCount: "4",
             rowsCount: "4",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
+            imageType: '0',
             cards: [],
             winModal: false,
             stopModal: false,
@@ -24,26 +26,49 @@ class Game extends React.Component {
     }
 
     loadImages(keyword, count) {
-        let flickrSearchURL = "https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=1&sort=interestingness-desc&page=1&extras=url_w";
-        let FLICKR_API_KEY = "c82dd287a39769d612a519299ad58bd0";
-        let searchUrl = `${flickrSearchURL}&api_key=${FLICKR_API_KEY}&text=${keyword}&per_page=${count}`;
-        let options = { mode: "cors" };
-        // searchUrl = '/test.json'; // test
-        fetch(searchUrl, options)
-            .then(response => response.json())
-            .then(json => {
-                if (json.stat === "ok" && json.photos.photo.length >= count) {
-                    this.setState((prevState) => ({
-                        mode: 2, cards: json.photos.photo
-                            .slice(0, count) // cut if result contains more elements
-                            .flatMap(e => [{ id: `1${e.id}`, src: e.url_w, flipped: 0 }, { id: `2${e.id}`, src: e.url_w, flipped: 0 }]) // map to cards
-                            .sort(() => .5 - Math.random()) // shuffle
-                    }));
-                } else {
-                    this.setState({ mode: 0 });
-                    this.setState({ errorMessage: `Error loading images. Result: ${json.stat}, count: ${json.photos.photo.length}` });
-                }
-            });
+        switch (keyword) {
+            case '#1':
+            case '#2':
+            case '#3':
+                let symbols = cartesian(keyword === '#1' ? ENGLISH_LETTERS : keyword === '#2' ? RUSSIAN_LETTERS : NUMBERS, BASE_COLORS)
+                    .sort(() => .5 - Math.random()) // choose random color letters
+                    .slice(0, count) // cut if result contains more elements
+                    .flatMap((e, i) => [{
+                        id: `1ltr${i}`,
+                        flipped: 0,
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="4" y="11" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                    }, {
+                        id: `2ltr${i}`,
+                        flipped: 0,
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="4" y="11" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                    }])
+                    .sort(() => .5 - Math.random()) // shuffle
+                    ;
+                this.setState((prevState) => ({
+                    mode: 2, cards: symbols
+                }));
+                break;
+            default:
+                let flickrSearchURL = "https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=1&sort=interestingness-desc&page=1&content_types=0&media=photos&extras=url_w";
+                let FLICKR_API_KEY = "c82dd287a39769d612a519299ad58bd0";
+                let searchUrl = `${flickrSearchURL}&api_key=${FLICKR_API_KEY}&text=${keyword}&per_page=${count}`;
+                let options = { mode: "cors" };
+                fetch(searchUrl, options)
+                    .then(response => response.json())
+                    .then(json => {
+                        if (json.stat === "ok" && json.photos.photo.length >= count) {
+                            this.setState((prevState) => ({
+                                mode: 2, cards: json.photos.photo
+                                    .slice(0, count) // cut if result contains more elements
+                                    .flatMap(e => [{ id: `1${e.id}`, src: e.url_w, flipped: 0 }, { id: `2${e.id}`, src: e.url_w, flipped: 0 }]) // map to cards
+                                    .sort(() => .5 - Math.random()) // shuffle
+                            }));
+                        } else {
+                            this.setState({ mode: 0 });
+                            this.setState({ errorMessage: `Error loading images. Result: ${json.stat}, count: ${json.photos.photo.length}` });
+                        }
+                    });
+        }
     }
 
     handlePlayClick() {
@@ -56,7 +81,20 @@ class Game extends React.Component {
         }
         else {
             this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
-            this.loadImages(this.state.searchKeyword, this.state.colsCount * this.state.rowsCount / 2);
+            let keyword;
+            switch (this.state.imageType) {
+                case '0':
+                    keyword = this.state.searchKeyword;
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                    keyword = `#${this.state.imageType}`
+                    break;
+                default:
+                    keyword = 'galaxy'
+            }
+            this.loadImages(keyword, this.state.colsCount * this.state.rowsCount / 2);
             //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300); //test
         }
     }
@@ -163,8 +201,15 @@ class Game extends React.Component {
                                         </Form.Select>
                                     </InputGroup>
                                     <InputGroup>
-                                        <InputGroup.Text>Keyword:</InputGroup.Text>
-                                        <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
+                                        <Form.Select aria-label="Source" name="imageType" xs="auto" value={this.state.imageType} onChange={this.handleInputChange.bind(this)}>
+                                            <option key='imagetype0' value='0'>Keyword</option>
+                                            <option key='imagetype1' value='1'>English letters</option>
+                                            <option key='imagetype2' value='2'>Russian letters</option>
+                                            <option key='imagetype3' value='3'>Numbers</option>
+                                        </Form.Select>
+                                        {this.state.imageType === '0' &&
+                                            <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
+                                        }
                                     </InputGroup>
                                 </Col>
                                 <Col xs="auto">
