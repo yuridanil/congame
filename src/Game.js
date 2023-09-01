@@ -3,8 +3,8 @@ import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { ANIMALS, SIZES, BASE_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS } from './Constants';
-import { cartesian } from "./Utils";
+import { ANIMALS, SIZES, BASE_COLORS, RGB_COLORS, CMY_COLORS, RGBCMY_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS } from './Constants';
+import { cartesian, genSvg } from "./Utils";
 
 class Game extends React.Component {
     successFlips = 0;
@@ -17,7 +17,7 @@ class Game extends React.Component {
             colsCount: "4",
             rowsCount: "4",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
-            imageType: '0',
+            imageType: '5',
             cards: [],
             winModal: false,
             stopModal: false,
@@ -26,12 +26,14 @@ class Game extends React.Component {
     }
 
     loadImages(keyword, count) {
+        let symbols;
+        console.log(keyword);
         switch (keyword) {
             case '#1':
             case '#2':
             case '#3':
             case '#4':
-                let symbols = cartesian(keyword === '#1' ? ENGLISH_LETTERS : keyword === '#2' ? RUSSIAN_LETTERS : keyword === '#3' ? NUMBERS : SYMBOLS, BASE_COLORS)
+                symbols = cartesian(keyword === '#1' ? ENGLISH_LETTERS : keyword === '#2' ? RUSSIAN_LETTERS : keyword === '#3' ? NUMBERS : SYMBOLS, BASE_COLORS)
                     .sort(() => .5 - Math.random()) // choose random color letters
                     .slice(0, count) // cut if result contains more elements
                     .flatMap((e, i) => [{
@@ -45,6 +47,22 @@ class Game extends React.Component {
                     }])
                     .sort(() => .5 - Math.random()) // shuffle
                     ;
+                this.setState((prevState) => ({
+                    mode: 2, cards: symbols
+                }));
+                break;
+            case '#5':
+                symbols = Array.from({ length: count }).map(e => new XMLSerializer().serializeToString(genSvg(100, 100, 0, 3, RGB_COLORS)))
+                    .flatMap((e, i) => [{
+                        id: `1ltr${i}`,
+                        flipped: 0,
+                        src: `data:image/svg+xml;utf8,` + e
+                    }, {
+                        id: `2ltr${i}`,
+                        flipped: 0,
+                        src: `data:image/svg+xml;utf8,` + e
+                    }])
+                    .sort(() => .5 - Math.random()) // shuffle;
                 this.setState((prevState) => ({
                     mode: 2, cards: symbols
                 }));
@@ -91,6 +109,7 @@ class Game extends React.Component {
                 case '2':
                 case '3':
                 case '4':
+                case '5':
                     keyword = `#${this.state.imageType}`
                     break;
                 default:
@@ -214,6 +233,7 @@ class Game extends React.Component {
                                             <option key='imagetype2' value='2'>Russian letters (А, Б, В)</option>
                                             <option key='imagetype3' value='3'>Numbers (1, 2, 3)</option>
                                             <option key='imagetype4' value='4'>Symbols (&, @, $)</option>
+                                            <option key='imagetype5' value='5'>Circles</option>
                                         </Form.Select>
                                         {this.state.imageType === '0' &&
                                             <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />

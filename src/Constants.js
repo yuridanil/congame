@@ -158,4 +158,7 @@ export const SYMBOLS = [
     '&lt;'
 ];
 
-export const BASE_COLORS = ['red', 'green', 'blue', 'orange', 'magenta', 'cyan', 'black', 'gray', 'indigo', 'aqua', 'brown', 'lime'];
+export const RGB_COLORS = ['red', 'green', 'blue'];
+export const CMY_COLORS = ['cyan', 'magenta', 'yellow'];
+export const RGBCMY_COLORS = [...RGB_COLORS, ...CMY_COLORS];
+export const BASE_COLORS = [...RGB_COLORS, 'orange', 'magenta', 'cyan', 'black', 'gray', 'indigo', 'aqua', 'brown', 'lime'];
