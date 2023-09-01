@@ -3,7 +3,7 @@ import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { ANIMALS, SIZES, BASE_COLORS, DISTINCT16_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS } from './Constants';
+import { ANIMALS, SIZES, BASE_COLORS, DISTINCT16_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS } from './Constants';
 import { cartesian, genSvg } from "./Utils";
 
 class Game extends React.Component {
@@ -27,23 +27,32 @@ class Game extends React.Component {
 
     loadImages(keyword, count) {
         let symbols;
-        console.log(keyword);
+        let chars;
+        switch (keyword) {
+            case '#1': chars = ENGLISH_LETTERS; break;
+            case '#2': chars = RUSSIAN_LETTERS; break;
+            case '#3': chars = NUMBERS; break;
+            case '#4': chars = SYMBOLS; break;
+            case '#5': chars = EMOJIS; break;
+        }
+        // console.log(chars);
         switch (keyword) {
             case '#1':
             case '#2':
             case '#3':
             case '#4':
-                symbols = cartesian(keyword === '#1' ? ENGLISH_LETTERS : keyword === '#2' ? RUSSIAN_LETTERS : keyword === '#3' ? NUMBERS : SYMBOLS, BASE_COLORS)
+            case '#5':
+                symbols = cartesian(chars, BASE_COLORS)
                     .sort(() => .5 - Math.random()) // choose random color letters
                     .slice(0, count) // cut if result contains more elements
                     .flatMap((e, i) => [{
                         id: `1ltr${i}`,
                         flipped: 0,
-                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 8px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
                     }, {
                         id: `2ltr${i}`,
                         flipped: 0,
-                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 10px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
+                        src: `data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font: bold 8px sans-serif; fill: ${e[1]};">${e[0]}</text></svg>`
                     }])
                     .sort(() => .5 - Math.random()) // shuffle
                     ;
@@ -51,7 +60,7 @@ class Game extends React.Component {
                     mode: 2, cards: symbols
                 }));
                 break;
-            case '#5':
+            case '#6':
                 symbols = Array.from({ length: count }).map(e => new XMLSerializer().serializeToString(genSvg(100, 100, 0, 5, DISTINCT16_COLORS)))
                     .flatMap((e, i) => [{
                         id: `1ltr${i}`,
@@ -110,6 +119,7 @@ class Game extends React.Component {
                 case '3':
                 case '4':
                 case '5':
+                case '6':
                     keyword = `#${this.state.imageType}`
                     break;
                 default:
@@ -233,7 +243,8 @@ class Game extends React.Component {
                                             <option key='imagetype2' value='2'>Russian letters (А, Б, В)</option>
                                             <option key='imagetype3' value='3'>Numbers (1, 2, 3)</option>
                                             <option key='imagetype4' value='4'>Symbols (&, @, $)</option>
-                                            <option key='imagetype5' value='5'>Circles</option>
+                                            <option key='imagetype5' value='5'>Emojis</option>
+                                            <option key='imagetype6' value='6'>Circles</option>
                                         </Form.Select>
                                         {this.state.imageType === '0' &&
                                             <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
