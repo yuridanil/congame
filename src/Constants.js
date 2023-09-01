@@ -162,3 +162,22 @@ export const RGB_COLORS = ['red', 'green', 'blue'];
 export const CMY_COLORS = ['cyan', 'magenta', 'yellow'];
 export const RGBCMY_COLORS = [...RGB_COLORS, ...CMY_COLORS];
 export const BASE_COLORS = [...RGB_COLORS, 'orange', 'magenta', 'cyan', 'black', 'gray', 'indigo', 'aqua', 'brown', 'lime'];
+export const DISTINCT16_COLORS = [
+    'darkslategray',
+    'sienna',
+    'darkgreen',
+    'navy',
+    'red',
+    'orange',
+    'yellow',
+    'lime',
+    'mediumspringgreen',
+    'blue',
+    'fuchsia',
+    'dodgerblue',
+    'khaki',
+    'plum',
+    'powderblue',
+    'deeppink'
+];
+

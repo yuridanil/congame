@@ -3,7 +3,7 @@ import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { ANIMALS, SIZES, BASE_COLORS, RGB_COLORS, CMY_COLORS, RGBCMY_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS } from './Constants';
+import { ANIMALS, SIZES, BASE_COLORS, DISTINCT16_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS } from './Constants';
 import { cartesian, genSvg } from "./Utils";
 
 class Game extends React.Component {
@@ -52,7 +52,7 @@ class Game extends React.Component {
                 }));
                 break;
             case '#5':
-                symbols = Array.from({ length: count }).map(e => new XMLSerializer().serializeToString(genSvg(100, 100, 0, 3, RGB_COLORS)))
+                symbols = Array.from({ length: count }).map(e => new XMLSerializer().serializeToString(genSvg(100, 100, 0, 5, DISTINCT16_COLORS)))
                     .flatMap((e, i) => [{
                         id: `1ltr${i}`,
                         flipped: 0,
