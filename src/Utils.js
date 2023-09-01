@@ -11,12 +11,13 @@ export const genSvg = (width, height, type, count, colors) => {
         let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         c.setAttribute('cx', Math.floor(Math.random() * width));
         c.setAttribute('cy', Math.floor(Math.random() * height));
-        c.setAttribute('r', Math.floor(Math.random() * width * height / 100));
+        c.setAttribute('r', Math.floor(Math.random() * Math.min(width, height) / 2));
 //        c.setAttribute('stroke', colors[Math.floor(Math.random() * colors.length)]);
         c.setAttribute('stroke', 'white');
         c.setAttribute('fill', colors[Math.floor(Math.random() * colors.length)]);
-        c.setAttribute('stroke-width', 1 + Math.floor(Math.random() * 5));
-        c.setAttribute('opacity', 0.5);
+//        c.setAttribute('stroke-width', 1 + Math.floor(Math.random() * 5));
+        c.setAttribute('stroke-width', 0);
+        c.setAttribute('opacity', .8);
         svg.appendChild(c);
     }
     return svg;
