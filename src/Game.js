@@ -26,23 +26,21 @@ class Game extends React.Component {
     }
 
     loadImages(keyword, count) {
-        let symbols;
-        let chars;
+        let symbols, chars, colors;
         switch (keyword) {
-            case '#1': chars = ENGLISH_LETTERS; break;
-            case '#2': chars = RUSSIAN_LETTERS; break;
-            case '#3': chars = NUMBERS; break;
-            case '#4': chars = SYMBOLS; break;
-            case '#5': chars = EMOJIS; break;
+            case '#1': chars = ENGLISH_LETTERS; colors = BASE_COLORS; break;
+            case '#2': chars = RUSSIAN_LETTERS; colors = BASE_COLORS; break;
+            case '#3': chars = NUMBERS; colors = BASE_COLORS; break;
+            case '#4': chars = SYMBOLS; colors = BASE_COLORS; break;
+            case '#5': chars = EMOJIS; colors = ['']; break;
         }
-        // console.log(chars);
         switch (keyword) {
             case '#1':
             case '#2':
             case '#3':
             case '#4':
             case '#5':
-                symbols = cartesian(chars, BASE_COLORS)
+                symbols = cartesian(chars, colors)
                     .sort(() => .5 - Math.random()) // choose random color letters
                     .slice(0, count) // cut if result contains more elements
                     .flatMap((e, i) => [{
