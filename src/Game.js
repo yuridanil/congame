@@ -17,7 +17,7 @@ class Game extends React.Component {
             colsCount: "4",
             rowsCount: "4",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
-            imageType: '5',
+            imageType: '6',
             cards: [],
             winModal: false,
             stopModal: false,

@@ -2,13 +2,13 @@ export const SIZES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
 
 export const IMAGE_TYPES = [
     'Keyword',
-    'Circles',
-    'English letters (A, B, C)',
-    'Russian letters (А, Б, В)',
-    'Numbers (1, 2, 3)',
-    'Symbols (&, @, $)',
-    'Emojis',
-    'Flags'
+    'Circles (🔴🟢🔵)',
+    'English letters (A B C)',
+    'Russian letters (А Б В)',
+    'Numbers (1 2 3)',
+    'Symbols (& @ $)',
+    'Emojis (😁🚦🚀)',
+    'Flags (🇻🇮 🇵🇫 🇹🇱)'
 ];
 
 export const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
