@@ -203,6 +203,11 @@ class Game extends React.Component {
         }
     }
 
+    handleGiveupClick() {
+        this.state.cards.forEach(e => this.setFlipped(e.id, true));
+        // this.setState({ mode: 3 });
+    }
+
     handleYes(id) {
         id === 1 && this.setState({ mode: 0, stopModal: false });
     }
@@ -269,6 +274,9 @@ class Game extends React.Component {
                             </Col>
                             <Col xs="auto">
                                 <Button onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
+                            </Col>
+                            <Col xs="auto">
+                                <Button variant="danger" onClick={this.handleGiveupClick.bind(this)}>Give Up</Button>
                             </Col>
                         </Row>
                     }
