@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+    <script>
+        window.onload = (e) => {
+            let options = { mode: "cors" };
+                fetch('https://unpkg.com/emoji.json/emoji.json', options)
+                    .then(response => response.json())
+                    .then(j => {
+                        let f = [];
+                        for (let i = 0; i < j.length; i++) {
+                            let e = j[i];
+                            if (e.codes.split(' ').length < 2) {
+                                // console.log(e.char, e.codes.split(' ').length);
+                                f.push(e.char);
+                            }
+                        }
+                         console.log(f);
+                    });
+        }
+    </script>
+</body>
+</html>
