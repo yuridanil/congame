@@ -15,7 +15,6 @@ class MyModal extends Component {
     };
 
     render() {
-        console.log(this.props.body);
         return (
             <Modal show={this.props.show} onHide={this.onNo.bind(this)}>
                 <Modal.Header closeButton>

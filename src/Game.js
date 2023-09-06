@@ -9,10 +9,10 @@ import { cartesian, genSvg } from "./Utils";
 class Game extends React.Component {
     successFlips = 0;
     failureFlips = 0;
+    oldScore = 0;
+    newScore = 0;
 
     constructor(props) {
-        // localStorage.setItem("scores", null);
-        console.log(localStorage.getItem("scores"));
         super(props);
         this.state = {
             mode: 0,
@@ -24,7 +24,7 @@ class Game extends React.Component {
             winModal: false,
             stopModal: false,
             errorMessage: null,
-            scores: JSON.parse(localStorage.getItem("scores") || {})
+            scores: JSON.parse(localStorage.getItem("scores") || '{}')
         };
         this.Timer1 = React.createRef();
     }
@@ -191,7 +191,7 @@ class Game extends React.Component {
                     this.setState((prevState) => ({ flipped1: null, flipped2: null }));
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) { // game over
-                        let scoreKey = this.state.imageType * this.state.colsCount + ";" + this.state.rowsCount;
+                        let scoreKey = this.state.imageType + ";" + this.state.colsCount * this.state.rowsCount;
                         let timeSpent = this.Timer1.current.state.value;
                         let flipscore = Math.round(
                             Math.max(0, 1 - this.failureFlips / (Math.pow(this.state.colsCount * this.state.rowsCount, 2) / 2)) * 100
@@ -203,24 +203,19 @@ class Game extends React.Component {
                             )
                         );
                         let score = (flipscore - 1) * 100 + timescore;
-                        console.log('timespent: ', timeSpent, ' flipscore: ', flipscore, ' timescore: ', timescore, ' score: ', score);
-
+                        this.oldScore = this.state.scores[scoreKey] || 0;
+                        this.newScore = score;
                         this.setState({ mode: 3, winModal: true });
-                        if (score > this.state.scores[scoreKey]) {
+                        if (this.newScore > this.oldScore) {
                             let newScores = {};
                             newScores[scoreKey] = score;
                             this.setState(
                                 (prevState) => ({
-                                    scores: { ...prevState.scores, ...newScores },
-                                    oldScore: prevState.scores[scoreKey],
-                                    newScore: score
+                                    scores: { ...prevState.scores, ...newScores }
                                 }),
                                 () => { localStorage.setItem('scores', JSON.stringify(this.state.scores)); }
                             );
                         }
-
-                        // this.setState({ todos: newTodos }, () => { localStorage.setItem('todos', JSON.stringify({ todos: [this.state.todos] })); }
-
                     }
                 } else { // not matching cards
                     this.failureFlips++;
@@ -248,6 +243,13 @@ class Game extends React.Component {
     handleNo(id) {
         id === 0 && this.setState({ mode: 3, winModal: false });
         id === 1 && this.setState({ stopModal: false });
+    }
+
+    handleClearClick() {
+        localStorage.removeItem("scores");
+        this.oldScore = 0;
+        this.newScore = 0;
+        this.setState({ scores: {} });
     }
 
     render() {
@@ -287,15 +289,18 @@ class Game extends React.Component {
                                 </Col>
 
                             </Row>
-                            <Row className="m-1 align-items-center justify-content-center">
+                            <Row className="m-1 align-items-center justify-content-center g-1">
                                 <Col xs="auto">
                                     <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear scores</Button>
                                 </Col>
                             </Row>
                         </>
                     }
                     {mode === 2 &&
-                        <Row className="m-1 align-items-center justify-content-center">
+                        <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Timer ref={this.Timer1} />
                             </Col>
@@ -303,10 +308,10 @@ class Game extends React.Component {
                                 <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
+                                <Button variant="secondary" onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
+                                <Button variant="secondary" onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
                             </Col>
                             <Col xs="auto">
                                 <Button variant="danger" onClick={this.handleGiveupClick.bind(this)}>Give Up</Button>
@@ -320,9 +325,25 @@ class Game extends React.Component {
                         </Row>
                     }
                     <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" onNo={this.handleNo.bind(this)}
-                        body={`${this.state.newScore > this.state.oldScore ? "New highscore: " : ""} Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`}
-                    />
+                        body={<>
+                            {
+                                <Row className="m-2 align-items-center justify-content-center g-1">
+                                    <Col xs="auto">
+                                        {this.newScore > this.oldScore ?
+                                            `🏅 New High Score: ${this.newScore} (Old Score: ${this.oldScore})` :
+                                            `Score: ${this.newScore} (High Score: ${this.oldScore})`}
+                                    </Col>
+                                </Row>
+                            }
 
+                            <Row className="m-2 align-items-center justify-content-center g-1">
+                                <Col xs="auto">
+                                    Number of flips: {this.successFlips + this.failureFlips} (successful: {this.successFlips}, failure: {this.failureFlips})
+                                </Col>
+                            </Row>
+                        </>
+                        }
+                    />
                     <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
                 </Form>
                 {(mode === 2 || mode === 3) &&
