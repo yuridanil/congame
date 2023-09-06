@@ -5,7 +5,8 @@ class Timer extends React.Component {
         super(props);
         this.state = {
             start: new Date(),
-            timer: "00:00"
+            timer: "00:00",
+            value: 0
         };
     }
 
@@ -25,7 +26,8 @@ class Timer extends React.Component {
         let minutes = Math.floor((now - (this.state.start)) / 1000 / 60);
         let seconds = Math.floor((now - (this.state.start)) / 1000 % 60);
         this.setState({
-            timer: `${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })}:${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })}`
+            timer: `${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })}:${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })}`,
+            value: this.state.value + 1
         });
     }
 

@@ -11,18 +11,22 @@ class Game extends React.Component {
     failureFlips = 0;
 
     constructor(props) {
+        // localStorage.setItem("scores", null);
+        console.log(localStorage.getItem("scores"));
         super(props);
         this.state = {
             mode: 0,
-            colsCount: "4",
-            rowsCount: "4",
+            colsCount: "2",
+            rowsCount: "2",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             imageType: '6',
             cards: [],
             winModal: false,
             stopModal: false,
-            errorMessage: null
+            errorMessage: null,
+            scores: JSON.parse(localStorage.getItem("scores") || {})
         };
+        this.Timer1 = React.createRef();
     }
 
     loadImages(keyword, count) {
@@ -187,7 +191,36 @@ class Game extends React.Component {
                     this.setState((prevState) => ({ flipped1: null, flipped2: null }));
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) { // game over
+                        let scoreKey = this.state.imageType * this.state.colsCount + ";" + this.state.rowsCount;
+                        let timeSpent = this.Timer1.current.state.value;
+                        let flipscore = Math.round(
+                            Math.max(0, 1 - this.failureFlips / (Math.pow(this.state.colsCount * this.state.rowsCount, 2) / 2)) * 100
+                        );
+                        let timescore = Math.min(100,
+                            Math.round(
+                                Math.max(0, (this.state.colsCount * this.state.rowsCount * 11 - timeSpent)) /
+                                (this.state.colsCount * this.state.rowsCount * 10) * 100
+                            )
+                        );
+                        let score = (flipscore - 1) * 100 + timescore;
+                        console.log('timespent: ', timeSpent, ' flipscore: ', flipscore, ' timescore: ', timescore, ' score: ', score);
+
                         this.setState({ mode: 3, winModal: true });
+                        if (score > this.state.scores[scoreKey]) {
+                            let newScores = {};
+                            newScores[scoreKey] = score;
+                            this.setState(
+                                (prevState) => ({
+                                    scores: { ...prevState.scores, ...newScores },
+                                    oldScore: prevState.scores[scoreKey],
+                                    newScore: score
+                                }),
+                                () => { localStorage.setItem('scores', JSON.stringify(this.state.scores)); }
+                            );
+                        }
+
+                        // this.setState({ todos: newTodos }, () => { localStorage.setItem('todos', JSON.stringify({ todos: [this.state.todos] })); }
+
                     }
                 } else { // not matching cards
                     this.failureFlips++;
@@ -264,7 +297,7 @@ class Game extends React.Component {
                     {mode === 2 &&
                         <Row className="m-1 align-items-center justify-content-center">
                             <Col xs="auto">
-                                <Timer />
+                                <Timer ref={this.Timer1} />
                             </Col>
                             <Col xs="auto">
                                 <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
@@ -286,7 +319,10 @@ class Game extends React.Component {
                             {mode === 1 && `Loading images...`}
                         </Row>
                     }
-                    <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" body={`Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`} onNo={this.handleNo.bind(this)} />
+                    <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" onNo={this.handleNo.bind(this)}
+                        body={`${this.state.newScore > this.state.oldScore ? "New highscore: " : ""} Number of flips: ${this.successFlips + this.failureFlips} (successful: ${this.successFlips}, failure:${this.failureFlips})`}
+                    />
+
                     <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
                 </Form>
                 {(mode === 2 || mode === 3) &&
