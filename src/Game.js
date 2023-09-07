@@ -361,7 +361,10 @@ class Game extends React.Component {
                 {mode === 4 &&
                     <>
                         <Row className="m-1 justify-content-center"><b>Score Table</b></Row>
-                        {Object.keys(this.state.scores).filter(e => e.split(';')[0] == this.state.imageType).map(e =>
+                        {Object.keys(this.state.scores)
+                        .filter(e => e.split(';')[0] == this.state.imageType)
+                        .sort((a, b) => a.split(";")[1] - b.split(";")[1])
+                        .map(e =>
                             <Row className="m-1 justify-content-center g-1" key={"ab" + e}>
                                 <Col xs="1" key={"a" + e}>{e.split(';')[1]}</Col>
                                 <Col xs="1" key={"b" + e}>
