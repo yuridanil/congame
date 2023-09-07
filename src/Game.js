@@ -138,6 +138,14 @@ class Game extends React.Component {
         this.setState({ stopModal: true });
     }
 
+    handleScoresClick() {
+        this.setState({ mode: 4 });
+    }
+
+    handleCloseScoreClick() {
+        this.setState({ mode: 0 });
+    }
+
     handleHintClick(duration) {
         if (this.state.hintCount > 0) {
             let hintTimeout = setTimeout(() => {
@@ -287,6 +295,9 @@ class Game extends React.Component {
                                     <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
                                 </Col>
                                 <Col xs="auto">
+                                    <Button variant="secondary" onClick={this.handleScoresClick.bind(this)} >Scores</Button>
+                                </Col>
+                                <Col xs="auto">
                                     <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear scores</Button>
                                 </Col>
                             </Row>
@@ -348,14 +359,22 @@ class Game extends React.Component {
                     />
                 }
                 {mode === 4 &&
-                    Object.keys(this.state.scores).filter(e => e.split(';')[0] == this.state.imageType).map(e =>
-                        <Row className="m-1 justify-content-center g-1" key={"ab" + e}>
-                            <Col xs="1" key={"a" + e}>{e.split(';')[1]}</Col>
-                            <Col xs="1" key={"b" + e}>
-                                {this.state.scores[e] == 10000 && "🏆" || this.state.scores[e]}
+                    <>
+                        <Row className="m-1 justify-content-center"><b>Score Table</b></Row>
+                        {Object.keys(this.state.scores).filter(e => e.split(';')[0] == this.state.imageType).map(e =>
+                            <Row className="m-1 justify-content-center g-1" key={"ab" + e}>
+                                <Col xs="1" key={"a" + e}>{e.split(';')[1]}</Col>
+                                <Col xs="1" key={"b" + e}>
+                                    {this.state.scores[e] == 10000 && "🏆" || this.state.scores[e]}
+                                </Col>
+                            </Row>
+                        )}
+                        <Row className="m-2 align-items-center justify-content-center g-1">
+                            <Col xs="auto">
+                                <Button variant="secondary" onClick={this.handleCloseScoreClick.bind(this)}>Close</Button>
                             </Col>
                         </Row>
-                    )
+                    </>
                 }
             </>
         );
