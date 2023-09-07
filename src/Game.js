@@ -16,7 +16,7 @@ class Game extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            mode: 0,
+            mode: 4,
             aspect: window.innerWidth / window.innerHeight,
             cardCount: "8",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
@@ -272,6 +272,7 @@ class Game extends React.Component {
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup>
+                                        <InputGroup.Text>Type:</InputGroup.Text>
                                         <Form.Select aria-label="Source" name="imageType" xs="auto" value={this.state.imageType} onChange={this.handleInputChange.bind(this)}>
                                             {IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{e}</option>)}
                                         </Form.Select>
@@ -345,6 +346,16 @@ class Game extends React.Component {
                         hintOn={this.state.hintOn}
                         onClick={this.handleCardClick.bind(this)}
                     />
+                }
+                {mode === 4 &&
+                    Object.keys(this.state.scores).filter(e => e.split(';')[0] == this.state.imageType).map(e =>
+                        <Row className="m-1 justify-content-center g-1" key={"ab" + e}>
+                            <Col xs="1" key={"a" + e}>{e.split(';')[1]}</Col>
+                            <Col xs="1" key={"b" + e}>
+                                {this.state.scores[e] == 10000 && "🏆" || this.state.scores[e]}
+                            </Col>
+                        </Row>
+                    )
                 }
             </>
         );
