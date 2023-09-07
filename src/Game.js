@@ -16,7 +16,7 @@ class Game extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            mode: 4,
+            mode: 0,
             aspect: window.innerWidth / window.innerHeight,
             cardCount: "8",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
