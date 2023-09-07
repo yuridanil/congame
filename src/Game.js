@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap';
+import { Button, Row, Col, FormControl, Form, InputGroup, Table } from 'react-bootstrap';
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
@@ -18,7 +18,7 @@ class Game extends React.Component {
         this.state = {
             mode: 0,
             aspect: window.innerWidth / window.innerHeight,
-            cardCount: "8",
+            cardCount: "16",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             imageType: '6',
             cards: [],
@@ -197,7 +197,6 @@ class Game extends React.Component {
                     this.setState((prevState) => ({ flipped1: null, flipped2: null }));
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) { // game over
-                        let scoreKey = this.state.imageType + ";" + this.state.cardCount;
                         let timeSpent = this.Timer1.current.state.value;
                         let flipscore = Math.round(
                             Math.max(0, 1 - this.failureFlips / (Math.pow(this.state.cardCount, 2) / 2)) * 100
@@ -209,12 +208,13 @@ class Game extends React.Component {
                             )
                         );
                         let score = (flipscore - 1) * 100 + timescore;
-                        this.oldScore = this.state.scores[scoreKey] || 0;
+                        this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.cardCount] || 0;
                         this.newScore = score;
                         this.setState({ mode: 3, winModal: true });
                         if (this.newScore > this.oldScore) {
-                            let newScores = {};
-                            newScores[scoreKey] = score;
+                            let newScores = { [this.state.imageType + ";" + this.state.cardCount]: score };
+                            // console.log(this.state.scores, newScores);
+                            //newScores[scoreKey] = score;
                             this.setState(
                                 (prevState) => ({
                                     scores: { ...prevState.scores, ...newScores }
@@ -295,10 +295,7 @@ class Game extends React.Component {
                                     <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button variant="secondary" onClick={this.handleScoresClick.bind(this)} >Scores</Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear scores</Button>
+                                    <Button variant="secondary" onClick={this.handleScoresClick.bind(this)} >Score table</Button>
                                 </Col>
                             </Row>
                         </>
@@ -361,20 +358,35 @@ class Game extends React.Component {
                 {mode === 4 &&
                     <>
                         <Row className="m-1 justify-content-center"><b>Score Table</b></Row>
-                        {Object.keys(this.state.scores)
-                        .filter(e => e.split(';')[0] == this.state.imageType)
-                        .sort((a, b) => a.split(";")[1] - b.split(";")[1])
-                        .map(e =>
-                            <Row className="m-1 justify-content-center g-1" key={"ab" + e}>
-                                <Col xs="1" key={"a" + e}>{e.split(';')[1]}</Col>
-                                <Col xs="1" key={"b" + e}>
-                                    {this.state.scores[e] == 10000 && "🏆" || this.state.scores[e]}
-                                </Col>
-                            </Row>
-                        )}
+                        <Row className="m-2 align-items-center justify-content-center g-1">
+                            <Col xs="auto">
+                                <Table striped bordered size="sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Num of Cards</th>
+                                            <th>High Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Object.keys(this.state.scores)
+                                            .filter(e => parseInt(e.split(';')[0]) === parseInt(this.state.imageType))
+                                            .sort((a, b) => parseInt(a.split(';')[1]) - parseInt(b.split(';')[1]))
+                                            .map(e =>
+                                                <tr>
+                                                    <td>{e.split(";")[1]}</td>
+                                                    <td>{(this.state.scores[e] === 10000 && "🏆") || this.state.scores[e]}</td>
+                                                </tr>
+                                            )}
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Button variant="secondary" onClick={this.handleCloseScoreClick.bind(this)}>Close</Button>
+                            </Col>
+                            <Col xs="auto">
+                                <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear scores</Button>
                             </Col>
                         </Row>
                     </>
