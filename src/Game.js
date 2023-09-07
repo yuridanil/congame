@@ -3,7 +3,7 @@ import { Button, Row, Col, FormControl, Form, InputGroup } from 'react-bootstrap
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { IMAGE_TYPES, SIZES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS } from './Constants';
+import { BOARD, IMAGE_TYPES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS } from './Constants';
 import { cartesian, genSvg } from "./Utils";
 
 class Game extends React.Component {
@@ -11,13 +11,14 @@ class Game extends React.Component {
     failureFlips = 0;
     oldScore = 0;
     newScore = 0;
+    bMap = new Map(BOARD);
 
     constructor(props) {
         super(props);
         this.state = {
             mode: 0,
-            colsCount: "2",
-            rowsCount: "2",
+            aspect: window.innerWidth / window.innerHeight,
+            cardCount: "8",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             imageType: '6',
             cards: [],
@@ -27,6 +28,10 @@ class Game extends React.Component {
             scores: JSON.parse(localStorage.getItem("scores") || '{}')
         };
         this.Timer1 = React.createRef();
+
+        window.onresize = () => {
+            this.setState({ aspect: window.innerWidth / window.innerHeight });
+        }
     }
 
     loadImages(keyword, count) {
@@ -107,33 +112,26 @@ class Game extends React.Component {
     handlePlayClick() {
         this.successFlips = 0;
         this.failureFlips = 0;
-        let cols = this.state.colsCount;
-        let rows = this.state.rowsCount;
-        if (cols * rows % 2 > 0 || cols < 2 || rows < 2 || cols > 16 || rows > 16) { // check input
-            this.setState({ errorMessage: "The number of cards must be even" });
+        this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
+        let keyword;
+        switch (this.state.imageType) {
+            case '0':
+                keyword = this.state.searchKeyword;
+                break;
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+                keyword = `#${this.state.imageType}`
+                break;
+            default:
+                keyword = 'galaxy'
         }
-        else {
-            this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
-            let keyword;
-            switch (this.state.imageType) {
-                case '0':
-                    keyword = this.state.searchKeyword;
-                    break;
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                    keyword = `#${this.state.imageType}`
-                    break;
-                default:
-                    keyword = 'galaxy'
-            }
-            this.loadImages(keyword, this.state.colsCount * this.state.rowsCount / 2);
-            //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300); //test
-        }
+        this.loadImages(keyword, this.state.cardCount / 2);
+        //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300); //test
     }
 
     handleStopClick() {
@@ -191,15 +189,15 @@ class Game extends React.Component {
                     this.setState((prevState) => ({ flipped1: null, flipped2: null }));
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) { // game over
-                        let scoreKey = this.state.imageType + ";" + this.state.colsCount * this.state.rowsCount;
+                        let scoreKey = this.state.imageType + ";" + this.state.cardCount;
                         let timeSpent = this.Timer1.current.state.value;
                         let flipscore = Math.round(
-                            Math.max(0, 1 - this.failureFlips / (Math.pow(this.state.colsCount * this.state.rowsCount, 2) / 2)) * 100
+                            Math.max(0, 1 - this.failureFlips / (Math.pow(this.state.cardCount, 2) / 2)) * 100
                         );
                         let timescore = Math.min(100,
                             Math.round(
-                                Math.max(0, (this.state.colsCount * this.state.rowsCount * 11 - timeSpent)) /
-                                (this.state.colsCount * this.state.rowsCount * 10) * 100
+                                Math.max(0, (this.state.cardCount * 11 - timeSpent)) /
+                                (this.state.cardCount * 10) * 100
                             )
                         );
                         let score = (flipscore - 1) * 100 + timescore;
@@ -265,18 +263,13 @@ class Game extends React.Component {
                                 <Col xs="auto">
                                     <InputGroup>
                                         <InputGroup.Text>Board size:</InputGroup.Text>
-                                        <Form.Select aria-label="Columns" name="colsCount" xs="auto" placeholder="Columns" defaultValue={this.state.colsCount} onChange={this.handleInputChange.bind(this)}>
-                                            {SIZES.map((e) => <option key={e} value={e}>{e}</option>)}
-                                        </Form.Select>
-                                        <InputGroup.Text>&#215;</InputGroup.Text>
-                                        <Form.Select aria-label="Columns" name="rowsCount" xs="auto" placeholder="Rows" defaultValue={this.state.rowsCount} onChange={this.handleInputChange.bind(this)}>
-                                            {SIZES.map((e) => <option key={e} value={e}>{e}</option>)}
+                                        <Form.Select aria-label="Cards" name="cardCount" xs="auto" placeholder="Cards" defaultValue={this.state.cardCount} onChange={this.handleInputChange.bind(this)}>
+                                            {[...BOARD].map((e) => <option key={e[0]} value={e[0]}>{`${e[0]} (${e[1][0]}x${e[1][1]})`}</option>)}
                                         </Form.Select>
                                     </InputGroup>
                                 </Col>
                             </Row>
                             <Row className="m-1 align-items-center justify-content-center">
-
                                 <Col xs="auto">
                                     <InputGroup>
                                         <Form.Select aria-label="Source" name="imageType" xs="auto" value={this.state.imageType} onChange={this.handleInputChange.bind(this)}>
@@ -287,7 +280,6 @@ class Game extends React.Component {
                                         }
                                     </InputGroup>
                                 </Col>
-
                             </Row>
                             <Row className="m-1 align-items-center justify-content-center g-1">
                                 <Col xs="auto">
@@ -347,7 +339,12 @@ class Game extends React.Component {
                     <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
                 </Form>
                 {(mode === 2 || mode === 3) &&
-                    <Board cards={this.state.cards} cols={parseInt(this.state.colsCount)} rows={parseInt(this.state.rowsCount)} hintOn={this.state.hintOn} onClick={this.handleCardClick.bind(this)} />
+                    <Board cards={this.state.cards}
+                        cols={this.state.aspect > 1 ? this.bMap.get(parseInt(this.state.cardCount))[1] : this.bMap.get(parseInt(this.state.cardCount))[0]}
+                        rows={this.state.aspect > 1 ? this.bMap.get(parseInt(this.state.cardCount))[0] : this.bMap.get(parseInt(this.state.cardCount))[1]}
+                        hintOn={this.state.hintOn}
+                        onClick={this.handleCardClick.bind(this)}
+                    />
                 }
             </>
         );
