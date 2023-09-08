@@ -190,9 +190,7 @@ class Game extends React.Component {
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) { // game over
                         let timeSpent = this.Timer1.current.state.value;
-                        let flipscore = Math.round(
-                            Math.max(0, 1 - this.failureFlips / (Math.pow(this.state.cardCount, 2) / 2)) * 100
-                        );
+                        let flipscore = Math.round(100 / Math.max(1, (this.failureFlips * 2 + 1) / this.state.cardCount));
                         let timescore = Math.min(100,
                             Math.round(
                                 Math.max(0, (this.state.cardCount * 11 - timeSpent)) /
@@ -200,6 +198,8 @@ class Game extends React.Component {
                             )
                         );
                         let score = (flipscore - 1) * 100 + timescore;
+                        // let score = flipscore * timescore;
+                        // let score = flipscore;
                         this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.cardCount] || 0;
                         this.newScore = score;
                         this.setState({ mode: 3, timerValue: this.Timer1.current.state.timer, winModal: true });
@@ -236,11 +236,11 @@ class Game extends React.Component {
                 this.state.cards.forEach(e => this.setFlipped(e.id, true));
                 this.setState({ showModal: false, mode: 3 });
             },
-            onModalNo : () => {
+            onModalNo: () => {
                 this.setState({ showModal: false });
             }
         });
-        
+
     }
 
     handleClearClick() {
@@ -254,11 +254,11 @@ class Game extends React.Component {
                 this.newScore = 0;
                 this.setState({ showModal: false, scores: {} });
             },
-            onModalNo : () => {
+            onModalNo: () => {
                 this.setState({ showModal: false });
             }
         });
-        
+
     }
 
     handleStopClick() {
@@ -269,11 +269,11 @@ class Game extends React.Component {
             onModalYes: () => {
                 this.setState({ showModal: false, mode: 0 });
             },
-            onModalNo : () => {
+            onModalNo: () => {
                 this.setState({ showModal: false });
             }
         });
-        
+
     }
 
     handleCloseModal() {
@@ -325,19 +325,19 @@ class Game extends React.Component {
                     {(mode === 2) &&
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
-                                <Timer ref={this.Timer1} />
+                                <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
+                                <Button variant="danger" onClick={this.handleGiveupClick.bind(this)}>Give Up</Button>
+                            </Col>
+                            <Col xs="auto">
+                                <Timer ref={this.Timer1} />
                             </Col>
                             <Col xs="auto">
                                 <Button variant="secondary" onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
                             </Col>
                             <Col xs="auto">
                                 <Button variant="secondary" onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
-                            </Col>
-                            <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleGiveupClick.bind(this)}>Give Up</Button>
                             </Col>
                         </Row>
                     }
