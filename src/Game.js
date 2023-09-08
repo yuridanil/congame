@@ -177,56 +177,6 @@ class Game extends React.Component {
         }));
     }
 
-    handleCardClick(id) {
-        let cards = this.state.cards;
-        let card = cards.find(e => e.id === id);
-        if (!card.flipped && this.state.flipped2 === null && this.state.hintOn === null) { // card not flipped and only one flipped yet in pair
-            this.setFlipped(id, true);
-            if (this.state.flipped1 === null) { // this is 1st card
-                this.setState({ flipped1: id });
-            } else { // this is 2nd card
-                if (this.state.flipped1.slice(1) === id.slice(1)) { // matching cards
-                    this.setState((prevState) => ({ flipped1: null, flipped2: null }));
-                    this.successFlips++;
-                    if (this.successFlips === cards.length / 2) { // game over
-                        let timeSpent = this.Timer1.current.state.value;
-                        let flipscore = Math.round(100 / Math.max(1, (this.failureFlips * 2 + 1) / this.state.cardCount));
-                        let timescore = Math.min(100,
-                            Math.round(
-                                Math.max(0, (this.state.cardCount * 11 - timeSpent)) /
-                                (this.state.cardCount * 10) * 100
-                            )
-                        );
-                        let score = (flipscore - 1) * 100 + timescore;
-                        // let score = flipscore * timescore;
-                        // let score = flipscore;
-                        this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.cardCount] || 0;
-                        this.newScore = score;
-                        this.setState({ mode: 3, timerValue: this.Timer1.current.state.timer, winModal: true });
-                        if (this.newScore > this.oldScore) {
-                            let newScores = { [this.state.imageType + ";" + this.state.cardCount]: score };
-                            this.setState(
-                                (prevState) => ({
-                                    scores: { ...prevState.scores, ...newScores }
-                                }),
-                                () => { localStorage.setItem('scores', JSON.stringify(this.state.scores)); }
-                            );
-                        }
-                    }
-                } else { // not matching cards
-                    this.failureFlips++;
-                    this.setState((prevState) => ({ flipped2: id }));
-                    let flipTimeout = setTimeout(() => { // flip not matching cards after 1 sec
-                        this.setFlipped(this.state.flipped1, false);
-                        this.setFlipped(this.state.flipped2, false);
-                        this.setState({ flipped1: null, flipped2: null });
-                        clearTimeout(flipTimeout);
-                    }, 1000);
-                }
-            }
-        }
-    }
-
     handleGiveupClick() {
         this.setState({
             showModal: true,
@@ -278,6 +228,49 @@ class Game extends React.Component {
 
     handleCloseModal() {
         this.setState({ mode: 3, winModal: false });
+    }
+
+    handleCardClick(id) {
+        let cards = this.state.cards;
+        let card = cards.find(e => e.id === id);
+        if (!card.flipped && this.state.flipped2 === null && this.state.hintOn === null) { // card not flipped and only one flipped yet in pair
+            this.setFlipped(id, true);
+            if (this.state.flipped1 === null) { // this is 1st card
+                this.setState({ flipped1: id });
+            } else { // this is 2nd card
+                if (this.state.flipped1.slice(1) === id.slice(1)) { // matching cards
+                    this.setState((prevState) => ({ flipped1: null, flipped2: null }));
+                    this.successFlips++;
+                    if (this.successFlips === cards.length / 2) { // game over
+                        let timeSpent = this.Timer1.current.state.value;
+                        let flipscore = Math.round(100 / Math.max(1, (this.failureFlips * 2 + 1) / this.state.cardCount));
+                        let timescore = Math.round(100 * Math.min(1, this.state.cardCount * 2 / timeSpent));
+                        let score = (flipscore - 1) * 100 + timescore;
+                        this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.cardCount] || 0;
+                        this.newScore = score;
+                        this.setState({ mode: 3, timerValue: this.Timer1.current.state.timer, winModal: true });
+                        if (this.newScore > this.oldScore) {
+                            let newScores = { [this.state.imageType + ";" + this.state.cardCount]: score };
+                            this.setState(
+                                (prevState) => ({
+                                    scores: { ...prevState.scores, ...newScores }
+                                }),
+                                () => { localStorage.setItem('scores', JSON.stringify(this.state.scores)); }
+                            );
+                        }
+                    }
+                } else { // not matching cards
+                    this.failureFlips++;
+                    this.setState((prevState) => ({ flipped2: id }));
+                    let flipTimeout = setTimeout(() => { // flip not matching cards after 1 sec
+                        this.setFlipped(this.state.flipped1, false);
+                        this.setFlipped(this.state.flipped2, false);
+                        this.setState({ flipped1: null, flipped2: null });
+                        clearTimeout(flipTimeout);
+                    }, 1000);
+                }
+            }
+        }
     }
 
     render() {
