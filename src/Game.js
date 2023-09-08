@@ -18,12 +18,12 @@ class Game extends React.Component {
         this.state = {
             mode: 0,
             aspect: window.innerWidth / window.innerHeight,
-            cardCount: "16",
+            cardCount: "4",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             imageType: '6',
             cards: [],
             winModal: false,
-            stopModal: false,
+            showModal: false,
             errorMessage: null,
             scores: JSON.parse(localStorage.getItem("scores") || '{}')
         };
@@ -134,16 +134,8 @@ class Game extends React.Component {
         //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300); //test
     }
 
-    handleStopClick() {
-        this.setState({ stopModal: true });
-    }
-
-    handleScoresClick() {
-        this.setState({ mode: 4 });
-    }
-
-    handleCloseScoreClick() {
-        this.setState({ mode: 0 });
+    handleScoresClick(newmode) {
+        this.setState({ mode: newmode });
     }
 
     handleHintClick(duration) {
@@ -210,11 +202,9 @@ class Game extends React.Component {
                         let score = (flipscore - 1) * 100 + timescore;
                         this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.cardCount] || 0;
                         this.newScore = score;
-                        this.setState({ mode: 3, winModal: true });
+                        this.setState({ mode: 3, timerValue: this.Timer1.current.state.timer, winModal: true });
                         if (this.newScore > this.oldScore) {
                             let newScores = { [this.state.imageType + ";" + this.state.cardCount]: score };
-                            // console.log(this.state.scores, newScores);
-                            //newScores[scoreKey] = score;
                             this.setState(
                                 (prevState) => ({
                                     scores: { ...prevState.scores, ...newScores }
@@ -238,24 +228,56 @@ class Game extends React.Component {
     }
 
     handleGiveupClick() {
-        this.state.cards.forEach(e => this.setFlipped(e.id, true));
-        // this.setState({ mode: 3 });
-    }
-
-    handleYes(id) {
-        id === 1 && this.setState({ mode: 0, stopModal: false });
-    }
-
-    handleNo(id) {
-        id === 0 && this.setState({ mode: 3, winModal: false });
-        id === 1 && this.setState({ stopModal: false });
+        this.setState({
+            showModal: true,
+            modalTitle: "Warning!",
+            modalBody: "Give up?",
+            onModalYes: () => {
+                this.state.cards.forEach(e => this.setFlipped(e.id, true));
+                this.setState({ showModal: false, mode: 3 });
+            },
+            onModalNo : () => {
+                this.setState({ showModal: false });
+            }
+        });
+        
     }
 
     handleClearClick() {
-        localStorage.removeItem("scores");
-        this.oldScore = 0;
-        this.newScore = 0;
-        this.setState({ scores: {} });
+        this.setState({
+            showModal: true,
+            modalTitle: "Warning!",
+            modalBody: "Clean up scores?",
+            onModalYes: () => {
+                localStorage.removeItem("scores");
+                this.oldScore = 0;
+                this.newScore = 0;
+                this.setState({ showModal: false, scores: {} });
+            },
+            onModalNo : () => {
+                this.setState({ showModal: false });
+            }
+        });
+        
+    }
+
+    handleStopClick() {
+        this.setState({
+            showModal: true,
+            modalTitle: "Warning!",
+            modalBody: "The progress will be lost. Are you sure?",
+            onModalYes: () => {
+                this.setState({ showModal: false, mode: 0 });
+            },
+            onModalNo : () => {
+                this.setState({ showModal: false });
+            }
+        });
+        
+    }
+
+    handleCloseModal() {
+        this.setState({ mode: 3, winModal: false });
     }
 
     render() {
@@ -295,12 +317,12 @@ class Game extends React.Component {
                                     <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button variant="secondary" onClick={this.handleScoresClick.bind(this)} >Score table</Button>
+                                    <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 4)} >Scores</Button>
                                 </Col>
                             </Row>
                         </>
                     }
-                    {mode === 2 &&
+                    {(mode === 2) &&
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Timer ref={this.Timer1} />
@@ -325,27 +347,22 @@ class Game extends React.Component {
                             {mode === 1 && `Loading images...`}
                         </Row>
                     }
-                    <MyModal id={0} show={this.state.winModal} no="Close" title="Win!" onNo={this.handleNo.bind(this)}
+                    <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
                         body={<>
-                            {
-                                <Row className="m-2 align-items-center justify-content-center g-1">
-                                    <Col xs="auto">
-                                        {this.newScore > this.oldScore ?
-                                            `🏅 New High Score: ${this.newScore} (Old Score: ${this.oldScore})` :
-                                            `Score: ${this.newScore} (High Score: ${this.oldScore})`}
-                                    </Col>
-                                </Row>
-                            }
-
                             <Row className="m-2 align-items-center justify-content-center g-1">
-                                <Col xs="auto">
-                                    Number of flips: {this.successFlips + this.failureFlips} (successful: {this.successFlips}, failure: {this.failureFlips})
-                                </Col>
+                                {this.newScore === 10000 ? `🏆 Top Score` :
+                                    this.newScore > this.oldScore ?
+                                        `🏅 New High Score: ${this.newScore} (Old Score: ${this.oldScore})` :
+                                        `Score: ${this.newScore} (High Score: ${this.oldScore})`}
                             </Row>
-                        </>
-                        }
+                            <Row className="m-2 align-items-center justify-content-center g-1">
+                                Number of flips: {this.successFlips + this.failureFlips} (successful: {this.successFlips}, failure: {this.failureFlips})
+                            </Row>
+                            <Row className="m-2 align-items-center justify-content-center g-1">
+                                Time spent: {this.state.timerValue}
+                            </Row>
+                        </>}
                     />
-                    <MyModal id={1} show={this.state.stopModal} yes="Yes" no="No" title="Warning!" body="The progress will be lost. Are you sure?" onYes={this.handleYes.bind(this)} onNo={this.handleNo.bind(this)} />
                 </Form>
                 {(mode === 2 || mode === 3) &&
                     <Board cards={this.state.cards}
@@ -358,6 +375,7 @@ class Game extends React.Component {
                 {mode === 4 &&
                     <>
                         <Row className="m-1 justify-content-center"><b>Score Table</b></Row>
+                        <Row className="m-1 justify-content-center">{IMAGE_TYPES[this.state.imageType]}</Row>
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Table striped bordered size="sm">
@@ -372,18 +390,19 @@ class Game extends React.Component {
                                             .filter(e => parseInt(e.split(';')[0]) === parseInt(this.state.imageType))
                                             .sort((a, b) => parseInt(a.split(';')[1]) - parseInt(b.split(';')[1]))
                                             .map(e =>
-                                                <tr>
+                                                <tr key={e}>
                                                     <td>{e.split(";")[1]}</td>
                                                     <td>{(this.state.scores[e] === 10000 && "🏆") || this.state.scores[e]}</td>
                                                 </tr>
                                             )}
+
                                     </tbody>
                                 </Table>
                             </Col>
                         </Row>
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
-                                <Button variant="secondary" onClick={this.handleCloseScoreClick.bind(this)}>Close</Button>
+                                <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 0)}>Close</Button>
                             </Col>
                             <Col xs="auto">
                                 <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear scores</Button>
@@ -391,6 +410,7 @@ class Game extends React.Component {
                         </Row>
                     </>
                 }
+                <MyModal show={this.state.showModal} yes="Yes" no="No" title={this.state.modalTitle} body={this.state.modalBody} onYes={this.state.onModalYes} onNo={this.state.onModalNo} />
             </>
         );
     }
