@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/congame/static/css/main.116a142c.css",
-    "main.js": "/congame/static/js/main.444e2683.js",
+    "main.js": "/congame/static/js/main.14bc6bdc.js",
     "static/js/787.5cbc9b13.chunk.js": "/congame/static/js/787.5cbc9b13.chunk.js",
     "index.html": "/congame/index.html",
     "main.116a142c.css.map": "/congame/static/css/main.116a142c.css.map",
-    "main.444e2683.js.map": "/congame/static/js/main.444e2683.js.map",
+    "main.14bc6bdc.js.map": "/congame/static/js/main.14bc6bdc.js.map",
     "787.5cbc9b13.chunk.js.map": "/congame/static/js/787.5cbc9b13.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.116a142c.css",
-    "static/js/main.444e2683.js"
+    "static/js/main.14bc6bdc.js"
   ]
 }
