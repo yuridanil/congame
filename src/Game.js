@@ -342,14 +342,38 @@ class Game extends React.Component {
                     }
                     <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
                         body={<>
+                            {this.newScore === 10000 ?
+                                <Row className="m-2 align-items-center justify-content-center g-1">
+                                    🏆 Top Score
+                                </Row>
+                                :
+                                this.newScore > this.oldScore ?
+                                    <>
+                                        <Row className="m-2 align-items-center justify-content-center g-1">
+                                            🏅 New High Score: {this.newScore}
+                                        </Row>
+                                        <Row className="m-2 align-items-center justify-content-center g-1">
+                                            Old Score: {this.oldScore}
+                                        </Row>
+                                    </>
+                                    :
+                                    <>
+                                        <Row className="m-2 align-items-center justify-content-center g-1">
+                                            Score: {this.newScore}
+                                        </Row>
+                                        <Row className="m-2 align-items-center justify-content-center g-1">
+                                            High Score: {this.oldScore}
+                                        </Row>
+                                    </>
+                            }
                             <Row className="m-2 align-items-center justify-content-center g-1">
-                                {this.newScore === 10000 ? `🏆 Top Score` :
-                                    this.newScore > this.oldScore ?
-                                        `🏅 New High Score: ${this.newScore} (Old Score: ${this.oldScore})` :
-                                        `Score: ${this.newScore} (High Score: ${this.oldScore})`}
+                                Number of flips: {this.successFlips + this.failureFlips}
                             </Row>
                             <Row className="m-2 align-items-center justify-content-center g-1">
-                                Number of flips: {this.successFlips + this.failureFlips} (successful: {this.successFlips}, failure: {this.failureFlips})
+                                Successful: {this.successFlips}
+                            </Row>
+                            <Row className="m-2 align-items-center justify-content-center g-1">
+                                Failure: {this.failureFlips}
                             </Row>
                             <Row className="m-2 align-items-center justify-content-center g-1">
                                 Time spent: {this.state.timerValue}
