@@ -341,44 +341,54 @@ class Game extends React.Component {
                         </Row>
                     }
                     <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
-                        body={<>
-                            {this.newScore === 10000 ?
-                                <Row className="m-2 align-items-center justify-content-center g-1">
-                                    🏆 Top Score
-                                </Row>
-                                :
-                                this.newScore > this.oldScore ?
-                                    <>
-                                        <Row className="m-2 align-items-center justify-content-center g-1">
-                                            🏅 New High Score: {this.newScore}
-                                        </Row>
-                                        <Row className="m-2 align-items-center justify-content-center g-1">
-                                            Old Score: {this.oldScore}
-                                        </Row>
-                                    </>
-                                    :
-                                    <>
-                                        <Row className="m-2 align-items-center justify-content-center g-1">
-                                            Score: {this.newScore}
-                                        </Row>
-                                        <Row className="m-2 align-items-center justify-content-center g-1">
-                                            High Score: {this.oldScore}
-                                        </Row>
-                                    </>
-                            }
+                        body={
                             <Row className="m-2 align-items-center justify-content-center g-1">
-                                Number of flips: {this.successFlips + this.failureFlips}
+                                <Col xs="auto">
+                                    <Table size="sm" borderless>
+                                        <tbody>
+                                            {this.newScore === 10000 ?
+                                                <tr>
+                                                    <td colSpan={2}>
+                                                        🏆 Top Score
+                                                    </td>
+                                                </tr>
+                                                :
+                                                this.newScore > this.oldScore ?
+                                                    <>
+                                                        <tr>
+                                                            <td>🏅 New High Score:</td> <td>{this.newScore}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Old Score:</td> <td>{this.oldScore}</td>
+                                                        </tr>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <tr>
+                                                            <td>Score:</td> <td>{this.newScore}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>High Score:</td> <td>{this.oldScore}</td>
+                                                        </tr>
+                                                    </>
+                                            }
+                                            <tr>
+                                                <td>Number of flips:</td><td>{this.successFlips + this.failureFlips}</td>
+                                            </tr>
+                                            <tr className="m-2 align-items-center justify-content-center g-1">
+                                                <td>Successful:</td><td>{this.successFlips}</td>
+                                            </tr>
+                                            <tr className="m-2 align-items-center justify-content-center g-1">
+                                                <td>Failure:</td><td>{this.failureFlips}</td>
+                                            </tr>
+                                            <tr className="m-2 align-items-center justify-content-center g-1">
+                                                <td>Time spent:</td><td>{this.state.timerValue}</td>
+                                            </tr>
+                                        </tbody>
+                                    </Table>
+                                </Col>
                             </Row>
-                            <Row className="m-2 align-items-center justify-content-center g-1">
-                                Successful: {this.successFlips}
-                            </Row>
-                            <Row className="m-2 align-items-center justify-content-center g-1">
-                                Failure: {this.failureFlips}
-                            </Row>
-                            <Row className="m-2 align-items-center justify-content-center g-1">
-                                Time spent: {this.state.timerValue}
-                            </Row>
-                        </>}
+                        }
                     />
                 </Form>
                 {(mode === 2 || mode === 3) &&
