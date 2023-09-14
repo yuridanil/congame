@@ -18,9 +18,9 @@ class Game extends React.Component {
         this.state = {
             mode: 0,
             aspect: window.innerWidth / window.innerHeight,
-            cardCount: "4",
+            cardCount: localStorage.getItem("cardCount") || "4",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
-            imageType: '6',
+            imageType: localStorage.getItem("imageType") || "6",
             cards: [],
             winModal: false,
             showModal: false,
@@ -47,7 +47,7 @@ class Game extends React.Component {
         }
         switch (keyword) {
             case '#1':
-                symbols = Array.from({ length: count }).map(e => new XMLSerializer().serializeToString(genSvg(512, 512, 0, 5, DISTINCT16_COLORS)))
+                symbols = Array.from({ length: count }).map(e => new XMLSerializer().serializeToString(genSvg(512, 512, 0, 3, DISTINCT16_COLORS)))
                     .flatMap((e, i) => [{
                         id: `1ltr${i}`,
                         flipped: 0,
@@ -135,6 +135,8 @@ class Game extends React.Component {
     }
 
     handlePlayClick() {
+        localStorage.setItem('cardCount', this.state.cardCount);
+        localStorage.setItem('imageType', this.state.imageType);
         this.newGame();
     }
 
@@ -247,13 +249,13 @@ class Game extends React.Component {
                     this.setState((prevState) => ({ flipped1: null, flipped2: null }));
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) { // game over
-                        let timeSpent = this.Timer1.current.state.value;
+                        let timeSpent = this.Timer1.current.getSeconds();
                         let flipscore = Math.round(100 / Math.max(1, (this.failureFlips * 2 + 1) / this.state.cardCount));
                         let timescore = Math.round(100 * Math.min(1, this.state.cardCount * 2 / timeSpent));
                         let score = (flipscore - 1) * 100 + timescore;
                         this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.cardCount] || 0;
                         this.newScore = score;
-                        this.setState({ mode: 3, timerValue: this.Timer1.current.state.timer, winModal: true });
+                        this.setState({ mode: 3, timerValue: timeSpent, winModal: true });
                         if (this.newScore > this.oldScore) {
                             let newScores = { [this.state.imageType + ";" + this.state.cardCount]: score };
                             this.setState(
@@ -283,7 +285,7 @@ class Game extends React.Component {
         return (
             <>
                 <Form className="cgform">
-                    {(mode === 0 || mode === 3 || mode === 1) &&
+                    {(mode === 0 || mode === 3) &&
                         <>
                             <Row className="m-1 justify-content-center"><b>Concentration Game</b></Row>
                             <Row className="m-1 justify-content-center">Find two cards that match to win the Game</Row>
@@ -291,7 +293,7 @@ class Game extends React.Component {
                                 <Col xs="auto">
                                     <InputGroup>
                                         <InputGroup.Text>Board size:</InputGroup.Text>
-                                        <Form.Select aria-label="Cards" name="cardCount" xs="auto" placeholder="Cards" defaultValue={this.state.cardCount} onChange={this.handleInputChange.bind(this)}>
+                                        <Form.Select className="w-50" aria-label="Cards" name="cardCount" xs="auto" placeholder="Cards" defaultValue={this.state.cardCount} onChange={this.handleInputChange.bind(this)}>
                                             {[...BOARD].map((e) => <option key={e[0]} value={e[0]}>{`${e[0]} (${e[1][0]}x${e[1][1]})`}</option>)}
                                         </Form.Select>
                                     </InputGroup>
@@ -323,10 +325,10 @@ class Game extends React.Component {
                     {(mode === 2) &&
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
-                                <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
+                                <Button className="" onClick={this.handleStopClick.bind(this)}>&nbsp;&nbsp;Stop&nbsp;&nbsp;</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>New</Button>
+                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>&nbsp;&nbsp;New&nbsp;&nbsp;</Button>
                             </Col>
                             <Col xs="auto">
                                 <Timer ref={this.Timer1} />
@@ -437,7 +439,7 @@ class Game extends React.Component {
                                 <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 0)}>Close</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear scores</Button>
+                                <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear</Button>
                             </Col>
                         </Row>
                     </>

@@ -29,6 +29,10 @@ class Timer extends React.Component {
         });
     }
 
+    getSeconds() {
+        return Math.floor(((new Date()) - (this.state.start)) / 1000);
+    }
+
     render() {
         let diff = Math.floor(((new Date()) - (this.state.start)) / 1000);
         let minutes = Math.floor(diff / 60);
