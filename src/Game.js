@@ -109,7 +109,7 @@ class Game extends React.Component {
         }
     }
 
-    handlePlayClick() {
+    newGame() {
         this.successFlips = 0;
         this.failureFlips = 0;
         this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
@@ -132,6 +132,10 @@ class Game extends React.Component {
         }
         this.loadImages(keyword, this.state.cardCount / 2);
         //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300); //test
+    }
+
+    handlePlayClick() {
+        this.newGame();
     }
 
     handleScoresClick(newmode) {
@@ -177,14 +181,15 @@ class Game extends React.Component {
         }));
     }
 
-    handleGiveupClick() {
+    handleNewGameClick() {
         this.setState({
             showModal: true,
             modalTitle: "Warning!",
-            modalBody: "Give up?",
+            modalBody: "Start new game?",
             onModalYes: () => {
-                this.state.cards.forEach(e => this.setFlipped(e.id, true));
-                this.setState({ showModal: false, mode: 3 });
+                this.setState({ showModal: false });
+                this.Timer1.current.restart();
+                this.newGame();
             },
             onModalNo: () => {
                 this.setState({ showModal: false });
@@ -217,13 +222,13 @@ class Game extends React.Component {
             modalTitle: "Warning!",
             modalBody: "The progress will be lost. Are you sure?",
             onModalYes: () => {
-                this.setState({ showModal: false, mode: 0 });
+                this.state.cards.forEach(e => this.setFlipped(e.id, true));
+                this.setState({ showModal: false, mode: 3 });
             },
             onModalNo: () => {
                 this.setState({ showModal: false });
             }
         });
-
     }
 
     handleCloseModal() {
@@ -321,7 +326,7 @@ class Game extends React.Component {
                                 <Button onClick={this.handleStopClick.bind(this)}>Stop</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleGiveupClick.bind(this)}>Give Up</Button>
+                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>New</Button>
                             </Col>
                             <Col xs="auto">
                                 <Timer ref={this.Timer1} />

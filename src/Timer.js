@@ -4,16 +4,14 @@ class Timer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            start: new Date(),
-            timer: "00:00",
-            value: 0
+            start: new Date()
         };
     }
 
     componentDidMount() {
         this.timerID = setInterval(
             () => this.tick(),
-            1000
+            100
         );
     }
 
@@ -22,19 +20,22 @@ class Timer extends React.Component {
     }
 
     tick() {
-        let now = new Date();
-        let minutes = Math.floor((now - (this.state.start)) / 1000 / 60);
-        let seconds = Math.floor((now - (this.state.start)) / 1000 % 60);
+        this.forceUpdate();
+    }
+
+    restart() {
         this.setState({
-            timer: `${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })}:${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })}`,
-            value: this.state.value + 1
+            start: new Date()
         });
     }
 
     render() {
+        let diff = Math.floor(((new Date()) - (this.state.start)) / 1000);
+        let minutes = Math.floor(diff / 60);
+        let seconds = Math.floor(diff % 60);
         return (
             <div className="Timer">
-                {this.state.timer}
+                {`${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })}:${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })}`}
             </div>
         );
     }
