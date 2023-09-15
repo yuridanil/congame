@@ -5,6 +5,7 @@ import Timer from "./Timer";
 import MyModal from "./MyModal";
 import { BOARD, IMAGE_TYPES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS } from './Constants';
 import { cartesian, genSvg } from "./Utils";
+import Svgtext from "./Svgtext";
 
 class Game extends React.Component {
     successFlips = 0;
@@ -325,10 +326,10 @@ class Game extends React.Component {
                     {(mode === 2) &&
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
-                                <Button className="" onClick={this.handleStopClick.bind(this)}>&nbsp;&nbsp;Stop&nbsp;&nbsp;</Button>
+                                <Button className="" onClick={this.handleStopClick.bind(this)}>Stop</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>&nbsp;&nbsp;New&nbsp;&nbsp;</Button>
+                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>New</Button>
                             </Col>
                             <Col xs="auto">
                                 <Timer ref={this.Timer1} />
@@ -348,37 +349,22 @@ class Game extends React.Component {
                         </Row>
                     }
                     <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
-                        body={
+                        body={<>
+                            <Row className="m-2 align-items-center justify-content-center g-1 fs-2">
+                                {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
+                            </Row>
                             <Row className="m-2 align-items-center justify-content-center g-1">
                                 <Col xs="auto">
                                     <Table size="sm" borderless>
                                         <tbody>
-                                            {this.newScore === 10000 ?
-                                                <tr>
-                                                    <td colSpan={2}>
-                                                        🏆 Top Score
-                                                    </td>
-                                                </tr>
-                                                :
-                                                this.newScore > this.oldScore ?
-                                                    <>
-                                                        <tr>
-                                                            <td>🏅 New High Score:</td> <td>{this.newScore}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Old Score:</td> <td>{this.oldScore}</td>
-                                                        </tr>
-                                                    </>
-                                                    :
-                                                    <>
-                                                        <tr>
-                                                            <td>Score:</td> <td>{this.newScore}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>High Score:</td> <td>{this.oldScore}</td>
-                                                        </tr>
-                                                    </>
-                                            }
+                                            <tr>
+                                                <td>{this.newScore === 10000 ? "Top" : this.newScore > this.oldScore && "New High"} Score:</td>
+                                                <td>{this.newScore}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>{this.newScore > this.oldScore ? "Old" : "High"}  Score:</td>
+                                                <td>{this.oldScore}</td>
+                                            </tr>
                                             <tr>
                                                 <td>Number of flips:</td><td>{this.successFlips + this.failureFlips}</td>
                                             </tr>
@@ -395,7 +381,7 @@ class Game extends React.Component {
                                     </Table>
                                 </Col>
                             </Row>
-                        }
+                        </>}
                     />
                 </Form>
                 {(mode === 2 || mode === 3) &&
