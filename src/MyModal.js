@@ -16,7 +16,7 @@ class MyModal extends Component {
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.onNo.bind(this)} centered>
+            <Modal show={this.props.show} onHide={this.onNo.bind(this)} centered size="sm">
                 <Modal.Header closeButton>
                     <Modal.Title>{this.props.title}</Modal.Title>
                 </Modal.Header>

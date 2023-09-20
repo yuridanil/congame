@@ -281,15 +281,20 @@ class Game extends React.Component {
         }
     }
 
+
+    handleTestClick() {
+        this.setState({ mode: 10 });
+    }
+
     render() {
         const mode = this.state.mode;
         return (
             <>
                 <Form className="cgform">
+                {(mode === 0 || mode === 3 || mode === 4) && <Row className="mt-3 justify-content-center"><h2>Concentration Game</h2></Row> }
                     {(mode === 0 || mode === 3) &&
                         <>
-                            <Row className="m-1 justify-content-center"><b>Concentration Game</b></Row>
-                            <Row className="m-1 justify-content-center">Find two cards that match to win the Game</Row>
+                            <Row className="mb-3 justify-content-center">Find two cards that match to win the Game</Row>
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup>
@@ -394,9 +399,9 @@ class Game extends React.Component {
                 }
                 {mode === 4 &&
                     <>
-                        <Row className="m-1 justify-content-center"><b>Score Table</b></Row>
-                        <Row className="m-1 justify-content-center">{IMAGE_TYPES[this.state.imageType]}</Row>
-                        <Row className="m-2 align-items-center justify-content-center g-1">
+                        <Row className="m-1 justify-content-center">Score Table: {IMAGE_TYPES[this.state.imageType]}</Row>
+                        <Row className="mb-3 justify-content-center"></Row>
+                        <Row className="m-1 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Table striped bordered size="sm">
                                     <thead>
