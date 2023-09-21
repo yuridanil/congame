@@ -281,7 +281,6 @@ class Game extends React.Component {
         }
     }
 
-
     handleTestClick() {
         this.setState({ mode: 10 });
     }
@@ -291,10 +290,10 @@ class Game extends React.Component {
         return (
             <>
                 <Form className="cgform">
-                {(mode === 0 || mode === 3 || mode === 4) && <Row className="mt-3 justify-content-center"><h2>Concentration Game</h2></Row> }
+                    {(mode === 0 || mode === 3 || mode === 4) && <Row className="m-1 pt-3 justify-content-center"><h3>Concentration Game</h3></Row>}
                     {(mode === 0 || mode === 3) &&
                         <>
-                            <Row className="mb-3 justify-content-center">Find two cards that match to win the Game</Row>
+                            <Row className="m-1 justify-content-center">Find two cards that match to win the Game</Row>
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup>
@@ -388,7 +387,7 @@ class Game extends React.Component {
                             </Row>
                         </>}
                     />
-                </Form>
+                </Form >
                 {(mode === 2 || mode === 3) &&
                     <Board cards={this.state.cards}
                         cols={this.state.aspect > 1 ? this.bMap.get(parseInt(this.state.cardCount))[1] : this.bMap.get(parseInt(this.state.cardCount))[0]}
@@ -397,10 +396,11 @@ class Game extends React.Component {
                         onClick={this.handleCardClick.bind(this)}
                     />
                 }
-                {mode === 4 &&
+                {
+                    mode === 4 &&
                     <>
                         <Row className="m-1 justify-content-center">Score Table: {IMAGE_TYPES[this.state.imageType]}</Row>
-                        <Row className="mb-3 justify-content-center"></Row>
+                        <Row className="m-1 justify-content-center"></Row>
                         <Row className="m-1 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Table striped bordered size="sm">
