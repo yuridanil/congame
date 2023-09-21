@@ -355,7 +355,9 @@ class Game extends React.Component {
                     <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
                         body={<>
                             <Row className="m-2 align-items-center justify-content-center g-1 fs-2">
-                                {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
+                                <Col xs="5">
+                                    {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
+                                </Col>
                             </Row>
                             <Row className="m-2 align-items-center justify-content-center g-1">
                                 <Col xs="auto">
