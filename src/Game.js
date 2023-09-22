@@ -19,7 +19,7 @@ class Game extends React.Component {
         this.state = {
             mode: 0,
             aspect: window.innerWidth / window.innerHeight,
-            cardCount: localStorage.getItem("cardCount") || "4",
+            level: localStorage.getItem("level") || "1",
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             imageType: localStorage.getItem("imageType") || "6",
             cards: [],
@@ -29,7 +29,6 @@ class Game extends React.Component {
             scores: JSON.parse(localStorage.getItem("scores") || '{}')
         };
         this.Timer1 = React.createRef();
-
         window.onresize = () => {
             this.setState({ aspect: window.innerWidth / window.innerHeight });
         }
@@ -131,12 +130,12 @@ class Game extends React.Component {
             default:
                 keyword = 'galaxy'
         }
-        this.loadImages(keyword, this.state.cardCount / 2);
-        //setTimeout(() => this.loadImages(this.state.searchKeyword, cols * rows / 2), 300); //test
+        let board = this.bMap.get(parseInt(this.state.level));
+        this.loadImages(keyword, board[0] * board[1] / 2);
     }
 
     handlePlayClick() {
-        localStorage.setItem('cardCount', this.state.cardCount);
+        localStorage.setItem('level', this.state.level);
         localStorage.setItem('imageType', this.state.imageType);
         this.newGame();
     }
@@ -251,14 +250,15 @@ class Game extends React.Component {
                     this.successFlips++;
                     if (this.successFlips === cards.length / 2) { // game over
                         let timeSpent = this.Timer1.current.getSeconds();
-                        let flipscore = Math.round(100 / Math.max(1, (this.failureFlips * 2 + 1) / this.state.cardCount));
-                        let timescore = Math.round(100 * Math.min(1, this.state.cardCount * 2 / timeSpent));
+                        let cardCount = this.bMap.get(parseInt(this.state.level)).reduce((a, b) => a * b, 1);
+                        let flipscore = Math.round(100 / Math.max(1, (this.failureFlips * 2 + 1) / cardCount));
+                        let timescore = Math.round(100 * Math.min(1, cardCount * 2 / timeSpent));
                         let score = (flipscore - 1) * 100 + timescore;
-                        this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.cardCount] || 0;
+                        this.oldScore = this.state.scores[this.state.imageType + ";" + this.state.level] || 0;
                         this.newScore = score;
                         this.setState({ mode: 3, timerValue: timeSpent, winModal: true });
                         if (this.newScore > this.oldScore) {
-                            let newScores = { [this.state.imageType + ";" + this.state.cardCount]: score };
+                            let newScores = { [this.state.imageType + ";" + this.state.level]: score };
                             this.setState(
                                 (prevState) => ({
                                     scores: { ...prevState.scores, ...newScores }
@@ -297,16 +297,6 @@ class Game extends React.Component {
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup>
-                                        <InputGroup.Text>Board size:</InputGroup.Text>
-                                        <Form.Select className="w-50" aria-label="Cards" name="cardCount" xs="auto" placeholder="Cards" defaultValue={this.state.cardCount} onChange={this.handleInputChange.bind(this)}>
-                                            {[...BOARD].map((e) => <option key={e[0]} value={e[0]}>{`${e[0]} (${e[1][0]}x${e[1][1]})`}</option>)}
-                                        </Form.Select>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                            <Row className="m-1 align-items-center justify-content-center">
-                                <Col xs="auto">
-                                    <InputGroup>
                                         <InputGroup.Text>Type:</InputGroup.Text>
                                         <Form.Select aria-label="Source" name="imageType" xs="auto" value={this.state.imageType} onChange={this.handleInputChange.bind(this)}>
                                             {IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{e}</option>)}
@@ -314,6 +304,24 @@ class Game extends React.Component {
                                         {this.state.imageType === '0' &&
                                             <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
                                         }
+                                    </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="m-1 align-items-center justify-content-center">
+                                <Col xs="auto">
+                                    <InputGroup>
+                                        <InputGroup.Text>Level:</InputGroup.Text>
+                                        <Form.Select className="w-50" aria-label="Cards" name="level" xs="auto" placeholder="Cards" defaultValue={this.state.level} onChange={this.handleInputChange.bind(this)}>
+                                            {[...BOARD].map((e) => 
+                                                <option key={e[0]} value={e[0]}>
+                                                    {`${e[0]} (${
+                                                        this.state.scores[this.state.imageType + ';' + e[0]] === 10000? "🏆" :
+                                                        this.state.scores[this.state.imageType + ';' + e[0]] || 0
+                                                })`}
+                                                </option>
+                                                )
+                                            }
+                                        </Form.Select>
                                     </InputGroup>
                                 </Col>
                             </Row>
@@ -327,7 +335,8 @@ class Game extends React.Component {
                             </Row>
                         </>
                     }
-                    {(mode === 2) &&
+                    { // Game
+                        (mode === 2) &&
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Button className="" onClick={this.handleStopClick.bind(this)}>Stop</Button>
@@ -346,59 +355,24 @@ class Game extends React.Component {
                             </Col>
                         </Row>
                     }
-                    {(mode === 0 || mode === 1 || mode === 3) &&
+                    { // Status text
+                        (mode === 0 || mode === 1 || mode === 3) &&
                         <Row className="m-1 align-items-center justify-content-center">
                             {mode === 0 && this.state.errorMessage && <p className="text-danger">{this.state.errorMessage}</p>}
                             {mode === 1 && `Loading images...`}
                         </Row>
                     }
-                    <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
-                        body={<>
-                            <Row className="m-2 align-items-center justify-content-center g-1 fs-2">
-                                <Col xs="5">
-                                    {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
-                                </Col>
-                            </Row>
-                            <Row className="m-2 align-items-center justify-content-center g-1">
-                                <Col xs="auto">
-                                    <Table size="sm" borderless>
-                                        <tbody>
-                                            <tr>
-                                                <td>{this.newScore === 10000 ? "Top" : this.newScore > this.oldScore && "New High"} Score:</td>
-                                                <td>{this.newScore}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>{this.newScore > this.oldScore ? "Old" : "High"}  Score:</td>
-                                                <td>{this.oldScore}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Number of flips:</td><td>{this.successFlips + this.failureFlips}</td>
-                                            </tr>
-                                            <tr className="m-2 align-items-center justify-content-center g-1">
-                                                <td>Successful:</td><td>{this.successFlips}</td>
-                                            </tr>
-                                            <tr className="m-2 align-items-center justify-content-center g-1">
-                                                <td>Failure:</td><td>{this.failureFlips}</td>
-                                            </tr>
-                                            <tr className="m-2 align-items-center justify-content-center g-1">
-                                                <td>Time spent:</td><td>{this.state.timerValue}</td>
-                                            </tr>
-                                        </tbody>
-                                    </Table>
-                                </Col>
-                            </Row>
-                        </>}
-                    />
                 </Form >
-                {(mode === 2 || mode === 3) &&
+                { // Board
+                    (mode === 2 || mode === 3) &&
                     <Board cards={this.state.cards}
-                        cols={this.state.aspect > 1 ? this.bMap.get(parseInt(this.state.cardCount))[1] : this.bMap.get(parseInt(this.state.cardCount))[0]}
-                        rows={this.state.aspect > 1 ? this.bMap.get(parseInt(this.state.cardCount))[0] : this.bMap.get(parseInt(this.state.cardCount))[1]}
+                        cols={this.state.aspect > 1 ? this.bMap.get(parseInt(this.state.level))[1] : this.bMap.get(parseInt(this.state.level))[0]}
+                        rows={this.state.aspect > 1 ? this.bMap.get(parseInt(this.state.level))[0] : this.bMap.get(parseInt(this.state.level))[1]}
                         hintOn={this.state.hintOn}
                         onClick={this.handleCardClick.bind(this)}
                     />
                 }
-                {
+                { // Score table
                     mode === 4 &&
                     <>
                         <Row className="m-1 justify-content-center">Score Table: {IMAGE_TYPES[this.state.imageType]}</Row>
@@ -408,8 +382,8 @@ class Game extends React.Component {
                                 <Table striped bordered size="sm">
                                     <thead>
                                         <tr>
-                                            <th>Num of Cards</th>
-                                            <th>High Score</th>
+                                            <th>Level</th>
+                                            <th>Score</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -429,14 +403,51 @@ class Game extends React.Component {
                         </Row>
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
-                                <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 0)}>Close</Button>
+                                <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear</Button>
+                                <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 0)}>Close</Button>
                             </Col>
                         </Row>
                     </>
                 }
+                <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
+                    body={<>
+                        <Row className="m-2 align-items-center justify-content-center g-1 fs-2">
+                            <Col xs="5">
+                                {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
+                            </Col>
+                        </Row>
+                        <Row className="m-2 align-items-center justify-content-center g-1">
+                            <Col xs="auto">
+                                <Table size="sm" borderless>
+                                    <tbody>
+                                        <tr>
+                                            <td>{this.newScore === 10000 ? "Top" : this.newScore > this.oldScore && "New High"} Score:</td>
+                                            <td>{this.newScore}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{this.newScore > this.oldScore ? "Old" : "High"}  Score:</td>
+                                            <td>{this.oldScore}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Number of flips:</td><td>{this.successFlips + this.failureFlips}</td>
+                                        </tr>
+                                        <tr className="m-2 align-items-center justify-content-center g-1">
+                                            <td>Successful:</td><td>{this.successFlips}</td>
+                                        </tr>
+                                        <tr className="m-2 align-items-center justify-content-center g-1">
+                                            <td>Failure:</td><td>{this.failureFlips}</td>
+                                        </tr>
+                                        <tr className="m-2 align-items-center justify-content-center g-1">
+                                            <td>Time spent:</td><td>{this.state.timerValue}</td>
+                                        </tr>
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
+                    </>}
+                />
                 <MyModal show={this.state.showModal} yes="Yes" no="No" title={this.state.modalTitle} body={this.state.modalBody} onYes={this.state.onModalYes} onNo={this.state.onModalNo} />
             </>
         );
