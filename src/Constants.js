@@ -2108,3 +2108,27 @@ export const FLAGS = [
     "🇿🇲",
     "🇿🇼"
 ];
+
+export const TOP_WORDS = [
+    'Amazing!',
+    'Awesome!',
+    'Great!',
+    'Excellent!',
+    'Wonderful!',
+    'Fantastic!',
+    'Perfect!',
+    'Incredible!'
+];
+
+export const GOOD_WORDS = [
+    'Cool!',
+    'Good!',
+    'You made it!',
+    'Well done!'
+];
+
+export const WIN_WORDS = [
+    'OK',
+    'Not bad)',
+    'You can do better)'
+];

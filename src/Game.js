@@ -3,7 +3,11 @@ import { Button, Row, Col, FormControl, Form, InputGroup, Table } from 'react-bo
 import Board from "./Board";
 import Timer from "./Timer";
 import MyModal from "./MyModal";
-import { BOARD, IMAGE_TYPES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS, ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS } from './Constants';
+import {
+    BOARD, IMAGE_TYPES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS,
+    ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS,
+    TOP_WORDS, GOOD_WORDS, WIN_WORDS
+} from './Constants';
 import { cartesian, genSvg } from "./Utils";
 import Svgtext from "./Svgtext";
 
@@ -417,10 +421,20 @@ class Game extends React.Component {
                         </Row>
                     </>
                 }
-                <MyModal show={this.state.winModal} yes="Next level" no="Close" title="Win!"
+                <MyModal show={this.state.winModal} yes="Next level" no="Close" title={"Level " + this.state.level + " - Win!"}
                     onNo={this.handleCloseModal.bind(this)}
                     onYes={this.handleNextLevel.bind(this)}
                     body={<>
+                        <Row className="m-2 align-items-center justify-content-center">
+                            <Col xs="auto">
+                                {this.newScore === 10000 ?
+                                    TOP_WORDS[Math.floor(Math.random() * TOP_WORDS.length)] :
+                                    this.newScore > this.oldScore ?
+                                        GOOD_WORDS[Math.floor(Math.random() * GOOD_WORDS.length)] :
+                                        WIN_WORDS[Math.floor(Math.random() * WIN_WORDS.length)]
+                                }
+                            </Col>
+                        </Row>
                         <Row className="m-2 align-items-center justify-content-center g-1 fs-2">
                             <Col xs="5">
                                 {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
