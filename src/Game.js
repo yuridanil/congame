@@ -110,6 +110,7 @@ class Game extends React.Component {
     }
 
     newGame() {
+        console.log(this.state.level);
         this.successFlips = 0;
         this.failureFlips = 0;
         this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
@@ -138,6 +139,12 @@ class Game extends React.Component {
         localStorage.setItem('level', this.state.level);
         localStorage.setItem('imageType', this.state.imageType);
         this.newGame();
+    }
+
+    handleNextLevel() {
+        this.setState((prevState) => ({ winModal: false, level: parseInt(prevState.level) + 1 }), () =>
+            this.handlePlayClick()
+        );
     }
 
     handleScoresClick(newmode) {
@@ -311,15 +318,14 @@ class Game extends React.Component {
                                 <Col xs="auto">
                                     <InputGroup>
                                         <InputGroup.Text>Level:</InputGroup.Text>
-                                        <Form.Select className="w-50" aria-label="Cards" name="level" xs="auto" placeholder="Cards" defaultValue={this.state.level} onChange={this.handleInputChange.bind(this)}>
-                                            {[...BOARD].map((e) => 
+                                        <Form.Select className="w-50" aria-label="Cards" name="level" xs="auto" placeholder="Cards" value={this.state.level} onChange={this.handleInputChange.bind(this)}>
+                                            {[...BOARD].map((e) =>
                                                 <option key={e[0]} value={e[0]}>
-                                                    {`${e[0]} (${
-                                                        this.state.scores[this.state.imageType + ';' + e[0]] === 10000? "🏆" :
+                                                    {`${e[0]} (${this.state.scores[this.state.imageType + ';' + e[0]] === 10000 ? "🏆" :
                                                         this.state.scores[this.state.imageType + ';' + e[0]] || 0
-                                                })`}
+                                                        })`}
                                                 </option>
-                                                )
+                                            )
                                             }
                                         </Form.Select>
                                     </InputGroup>
@@ -411,7 +417,9 @@ class Game extends React.Component {
                         </Row>
                     </>
                 }
-                <MyModal show={this.state.winModal} no="Close" title="Win!" onNo={this.handleCloseModal.bind(this)}
+                <MyModal show={this.state.winModal} yes="Next level" no="Close" title="Win!"
+                    onNo={this.handleCloseModal.bind(this)}
+                    onYes={this.handleNextLevel.bind(this)}
                     body={<>
                         <Row className="m-2 align-items-center justify-content-center g-1 fs-2">
                             <Col xs="5">
