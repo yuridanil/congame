@@ -10,12 +10,13 @@ import {
 } from './Constants';
 import { cartesian, genSvg } from "./Utils";
 import Svgtext from "./Svgtext";
+import version from './version.json';
 
 class Game extends React.Component {
     successFlips = 0;
     failureFlips = 0;
     oldScore = 0;
-    newScore = 10000;
+    newScore = 0;
     bMap = new Map(BOARD);
 
     constructor(props) {
@@ -27,12 +28,10 @@ class Game extends React.Component {
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             imageType: localStorage.getItem("imageType") || "6",
             cards: [],
-            //            winModal: false,
+            winModal: false,
             showModal: false,
             errorMessage: null,
-            scores: JSON.parse(localStorage.getItem("scores") || '{}'),
-
-            winModal: true
+            scores: JSON.parse(localStorage.getItem("scores") || '{}')
         };
         this.Timer1 = React.createRef();
         window.onresize = () => {
@@ -351,6 +350,13 @@ class Game extends React.Component {
                                     <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 4)} >Scores</Button>
                                 </Col>
                             </Row>
+                            {(mode === 0) &&
+                                <Row className="m-1 align-items-center justify-content-center g-1">
+                                    <Col xs="auto">
+                                        {`Version ${version.buildMajor}.${version.buildMinor}.${version.buildRevision}`}
+                                    </Col>
+                                </Row>
+                            }
                         </>
                     }
                     { // Game
