@@ -14,6 +14,10 @@ class MyModal extends Component {
         this.props.onNo(this.props.id);
     };
 
+    onCustom1() {
+        this.props.onCustom1(this.props.id);
+    };
+
     render() {
         return (
             <Modal show={this.props.show} onHide={this.onNo.bind(this)} centered size="sm">
@@ -22,6 +26,11 @@ class MyModal extends Component {
                 </Modal.Header>
                 <Modal.Body>{this.props.body}</Modal.Body>
                 <Modal.Footer>
+                    {this.props.custom1 &&
+                        <Button variant="primary" onClick={this.onCustom1.bind(this)}>
+                            {this.props.custom1}
+                        </Button>
+                    }
                     {this.props.yes &&
                         <Button variant="primary" onClick={this.onYes.bind(this)}>
                             {this.props.yes}

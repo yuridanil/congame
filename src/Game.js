@@ -15,7 +15,7 @@ class Game extends React.Component {
     successFlips = 0;
     failureFlips = 0;
     oldScore = 0;
-    newScore = 0;
+    newScore = 10000;
     bMap = new Map(BOARD);
 
     constructor(props) {
@@ -27,14 +27,25 @@ class Game extends React.Component {
             searchKeyword: ANIMALS[Math.floor(Math.random() * ANIMALS.length)],
             imageType: localStorage.getItem("imageType") || "6",
             cards: [],
-            winModal: false,
+            //            winModal: false,
             showModal: false,
             errorMessage: null,
-            scores: JSON.parse(localStorage.getItem("scores") || '{}')
+            scores: JSON.parse(localStorage.getItem("scores") || '{}'),
+
+            winModal: true
         };
         this.Timer1 = React.createRef();
         window.onresize = () => {
             this.setState({ aspect: window.innerWidth / window.innerHeight });
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        // save select state to local storage
+        for (let s in prevState) {
+            if (prevState[s] !== this.state[s] && ['level', 'imageType'].includes(s)) {
+                localStorage.setItem(s, this.state[s])
+            }
         }
     }
 
@@ -114,10 +125,9 @@ class Game extends React.Component {
     }
 
     newGame() {
-        console.log(this.state.level);
         this.successFlips = 0;
         this.failureFlips = 0;
-        this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null });
+        this.setState({ mode: 1, hintCount: 3, failureFlips: 0, hintOn: null, flipped1: null, flipped2: null, errorMessage: null, winModal: false });
         let keyword;
         switch (this.state.imageType) {
             case '0':
@@ -140,13 +150,11 @@ class Game extends React.Component {
     }
 
     handlePlayClick() {
-        localStorage.setItem('level', this.state.level);
-        localStorage.setItem('imageType', this.state.imageType);
         this.newGame();
     }
 
     handleNextLevel() {
-        this.setState((prevState) => ({ winModal: false, level: parseInt(prevState.level) + 1 }), () =>
+        this.setState((prevState) => ({ level: parseInt(prevState.level) + 1 }), () =>
             this.handlePlayClick()
         );
     }
@@ -325,9 +333,9 @@ class Game extends React.Component {
                                         <Form.Select className="w-50" aria-label="Cards" name="level" xs="auto" placeholder="Cards" value={this.state.level} onChange={this.handleInputChange.bind(this)}>
                                             {[...BOARD].map((e) =>
                                                 <option key={e[0]} value={e[0]}>
-                                                    {`${e[0]} (${this.state.scores[this.state.imageType + ';' + e[0]] === 10000 ? "🏆" :
-                                                        this.state.scores[this.state.imageType + ';' + e[0]] || 0
-                                                        })`}
+                                                    {`${e[0]}${this.state.scores[this.state.imageType + ';' + e[0]] === 10000 ? " 🏆" :
+                                                        this.state.scores[this.state.imageType + ';' + e[0]] < 10000 ? " 🏅" : ""
+                                                        }`}
                                                 </option>
                                             )
                                             }
@@ -421,26 +429,29 @@ class Game extends React.Component {
                         </Row>
                     </>
                 }
-                <MyModal show={this.state.winModal} yes="Next level" no="Close" title={"Level " + this.state.level + " - Win!"}
+                <MyModal show={this.state.winModal} yes="Next level" no="Close" custom1="Replay"
+                    title={"Level " + this.state.level + " - Win!"}
                     onNo={this.handleCloseModal.bind(this)}
                     onYes={this.handleNextLevel.bind(this)}
+                    onCustom1={this.handlePlayClick.bind(this)}
                     body={<>
-                        <Row className="m-2 align-items-center justify-content-center">
-                            <Col xs="auto">
+                        <Row className="align-items-center justify-content-center">
+                            <Col xs="auto"><h4>
                                 {this.newScore === 10000 ?
                                     TOP_WORDS[Math.floor(Math.random() * TOP_WORDS.length)] :
                                     this.newScore > this.oldScore ?
                                         GOOD_WORDS[Math.floor(Math.random() * GOOD_WORDS.length)] :
                                         WIN_WORDS[Math.floor(Math.random() * WIN_WORDS.length)]
                                 }
+                            </h4>
                             </Col>
                         </Row>
-                        <Row className="m-2 align-items-center justify-content-center g-1 fs-2">
+                        <Row className="align-items-center justify-content-center">
                             <Col xs="5">
                                 {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
                             </Col>
                         </Row>
-                        <Row className="m-2 align-items-center justify-content-center g-1">
+                        <Row className="align-items-center justify-content-center">
                             <Col xs="auto">
                                 <Table size="sm" borderless>
                                     <tbody>
@@ -455,13 +466,13 @@ class Game extends React.Component {
                                         <tr>
                                             <td>Number of flips:</td><td>{this.successFlips + this.failureFlips}</td>
                                         </tr>
-                                        <tr className="m-2 align-items-center justify-content-center g-1">
+                                        <tr className="align-items-center justify-content-center">
                                             <td>Successful:</td><td>{this.successFlips}</td>
                                         </tr>
-                                        <tr className="m-2 align-items-center justify-content-center g-1">
+                                        <tr className="align-items-center justify-content-center">
                                             <td>Failure:</td><td>{this.failureFlips}</td>
                                         </tr>
-                                        <tr className="m-2 align-items-center justify-content-center g-1">
+                                        <tr className="align-items-center justify-content-center">
                                             <td>Time spent:</td><td>{this.state.timerValue}</td>
                                         </tr>
                                     </tbody>

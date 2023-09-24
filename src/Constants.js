@@ -2,13 +2,13 @@ export const BOARD = [[1, [2, 2]], [2, [2, 3]], [3, [2, 4]], [4, [3, 4]], [5, [4
 
 export const IMAGE_TYPES = [
     'Keyword',
-    'Circles (🔴🟢🔵)',
-    'English letters (A B C)',
-    'Russian letters (А Б В)',
-    'Numbers (1 2 3)',
-    'Symbols (& @ $)',
-    'Emojis (😁🚦🚀)',
-    'Flags (🇻🇮 🇵🇫 🇹🇱)'
+    'Circles: 🔴🟢🔵',
+    'English letters: A B C',
+    'Russian letters: А Б В',
+    'Numbers: 1 2 3',
+    'Symbols: & @ $',
+    'Emojis: 😁🚦🚀',
+    'Flags: 🇻🇮 🇵🇫 🇹🇱'
 ];
 
 export const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -2129,6 +2129,5 @@ export const GOOD_WORDS = [
 
 export const WIN_WORDS = [
     'OK',
-    'Not bad)',
-    'You can do better)'
+    'Not bad'
 ];
