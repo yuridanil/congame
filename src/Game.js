@@ -361,7 +361,7 @@ class Game extends React.Component {
                     }
                     { // Game
                         (mode === 2) &&
-                        <Row className="m-2 align-items-center justify-content-center g-1">
+                        <Row className=".mx-0 .my-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Button className="" onClick={this.handleStopClick.bind(this)}>Stop</Button>
                             </Col>
