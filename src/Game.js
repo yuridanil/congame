@@ -7,7 +7,7 @@ import {
     BOARD, IMAGE_TYPES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS,
     ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS,
     TOP_WORDS, GOOD_WORDS, WIN_WORDS,
-    SMILES
+    SMILES, SHAPES
 } from './Constants';
 import { cartesian, genSvg } from "./Utils";
 import Svgtext from "./Svgtext";
@@ -51,6 +51,10 @@ class Game extends React.Component {
         }
     }
 
+    componentDidMount() {
+        document.title = this.state.lang.title;
+    }
+
     loadImages(keyword, count) {
         let symbols, chars, colors;
         switch (keyword) {
@@ -61,6 +65,7 @@ class Game extends React.Component {
             case '#6': chars = EMOJIS; colors = ['']; break;
             case '#7': chars = FLAGS; colors = ['']; break;
             case '#8': chars = SMILES; colors = ['']; break;
+            case '#9': chars = SHAPES; colors = BASE_COLORS; break;
             default: break;
         }
         switch (keyword) {
@@ -87,6 +92,7 @@ class Game extends React.Component {
             case '#6':
             case '#7':
             case '#8':
+            case '#9':
                 symbols = cartesian(chars, colors)
                     .sort(() => .5 - Math.random()) // choose random color letters
                     .slice(0, count) // cut if result contains more elements
@@ -145,6 +151,7 @@ class Game extends React.Component {
             case '6':
             case '7':
             case '8':
+            case '9':
                 keyword = `#${this.state.imageType}`
                 break;
             default:
@@ -412,7 +419,7 @@ class Game extends React.Component {
                         <Row className="m-1 justify-content-center"></Row>
                         <Row className="m-1 align-items-center justify-content-center g-1">
                             <Col xs="auto">
-                                <Table striped bordered size="sm">
+                                <Table size="sm table-striped table-bordered">
                                     <thead>
                                         <tr>
                                             <th>{this.state.lang.level}</th>

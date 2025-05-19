@@ -32,7 +32,7 @@ const langs = new Map([
     "warning": "Warning",
     "progresslost": "The progress will be lost. Are you sure",
     "cleanup": "Clean up scores",
-    "imagetypes": ["Keyword", "Circles", "English letters", "Russian letters", "Numbers", "Symbols", "Emojis", "Flags", "Smiles"]
+    "imagetypes": ["Keyword", "Circles", "English letters", "Russian letters", "Numbers", "Symbols", "Emojis", "Flags", "Smiles", "Shapes"]
   }],
   ["ru", {
     "lang": "ru",
@@ -67,7 +67,7 @@ const langs = new Map([
     "warning": "Внимание",
     "progresslost": "Текущий прогресс будет утерян. Вы уверены",
     "cleanup": "Очистить результаты",
-    "imagetypes": ["Ключевое слово", "Круги", "Английские буквы", "Русские буквы", "Цифры", "Символы", "Эмодзи", "Флаги", "Смайлы"]
+    "imagetypes": ["Ключевое слово", "Круги", "Английские буквы", "Русские буквы", "Цифры", "Символы", "Эмодзи", "Флаги", "Смайлы", "Формы"]
   }]
 ]);
 
