@@ -2240,7 +2240,6 @@ export const SMILES = [
     "🙊"
 ]
 
-
 export const SHAPES = [
     "◼",
     "◆",
