@@ -58,7 +58,7 @@ const langs = new Map([
     "successful": "Удачных",
     "failure": "Неудачных",
     "timespent": "Потрачено секунд",
-    "nextlevel": "Следующий уровень",
+    "nextlevel": "Следующий",
     "replay": "Заново",
     "win": "Победа",
     "yes": "Да",
