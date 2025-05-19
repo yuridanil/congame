@@ -305,10 +305,6 @@ class Game extends React.Component {
         }
     }
 
-    handleTestClick() {
-        this.setState({ mode: 10 });
-    }
-
     render() {
         const mode = this.state.mode;
         return (
@@ -455,7 +451,7 @@ class Game extends React.Component {
                     onCustom1={this.handlePlayClick.bind(this)}
                     body={<>
                         <Row className="align-items-center justify-content-center">
-                            <Col xs="5">
+                            <Col xs="5 g-1">
                                 {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
                             </Col>
                         </Row>
