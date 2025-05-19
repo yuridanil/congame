@@ -6,11 +6,13 @@ import MyModal from "./MyModal";
 import {
     BOARD, IMAGE_TYPES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS,
     ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS,
-    TOP_WORDS, GOOD_WORDS, WIN_WORDS
+    TOP_WORDS, GOOD_WORDS, WIN_WORDS,
+    SMILES
 } from './Constants';
 import { cartesian, genSvg } from "./Utils";
 import Svgtext from "./Svgtext";
 import version from './version.json';
+import { Lang } from './Lang';
 
 class Game extends React.Component {
     successFlips = 0;
@@ -22,6 +24,7 @@ class Game extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            lang: Lang,
             mode: 0,
             aspect: window.innerWidth / window.innerHeight,
             level: localStorage.getItem("level") || "1",
@@ -57,6 +60,7 @@ class Game extends React.Component {
             case '#5': chars = SYMBOLS; colors = BASE_COLORS; break;
             case '#6': chars = EMOJIS; colors = ['']; break;
             case '#7': chars = FLAGS; colors = ['']; break;
+            case '#8': chars = SMILES; colors = ['']; break;
             default: break;
         }
         switch (keyword) {
@@ -82,6 +86,7 @@ class Game extends React.Component {
             case '#5':
             case '#6':
             case '#7':
+            case '#8':
                 symbols = cartesian(chars, colors)
                     .sort(() => .5 - Math.random()) // choose random color letters
                     .slice(0, count) // cut if result contains more elements
@@ -139,6 +144,7 @@ class Game extends React.Component {
             case '5':
             case '6':
             case '7':
+            case '8':
                 keyword = `#${this.state.imageType}`
                 break;
             default:
@@ -204,8 +210,8 @@ class Game extends React.Component {
     handleNewGameClick() {
         this.setState({
             showModal: true,
-            modalTitle: "Warning!",
-            modalBody: "Start new game?",
+            modalTitle: `${this.state.lang.warning}!`,
+            modalBody: `${this.state.lang.startnew}?`,
             onModalYes: () => {
                 this.setState({ showModal: false });
                 this.Timer1.current.restart();
@@ -221,8 +227,8 @@ class Game extends React.Component {
     handleClearClick() {
         this.setState({
             showModal: true,
-            modalTitle: "Warning!",
-            modalBody: "Clean up scores?",
+            modalTitle: `${this.state.lang.warning}!`,
+            modalBody: `${this.state.lang.cleanup}!`,
             onModalYes: () => {
                 localStorage.removeItem("scores");
                 this.oldScore = 0;
@@ -239,8 +245,8 @@ class Game extends React.Component {
     handleStopClick() {
         this.setState({
             showModal: true,
-            modalTitle: "Warning!",
-            modalBody: "The progress will be lost. Are you sure?",
+            modalTitle: `${this.state.lang.warning}!`,
+            modalBody: `${this.state.lang.progresslost}?`,
             onModalYes: () => {
                 this.state.cards.forEach(e => this.setFlipped(e.id, true));
                 this.setState({ showModal: false, mode: 3 });
@@ -308,16 +314,18 @@ class Game extends React.Component {
         return (
             <>
                 <Form className="cgform">
-                    {(mode === 0 || mode === 3 || mode === 4) && <Row className="m-1 pt-3 justify-content-center"><h3>Concentration Game</h3></Row>}
+                    {(mode === 0 || mode === 3 || mode === 4) && <Row className="m-1 pt-3 justify-content-center"><h3>{this.state.lang.title}</h3></Row>}
                     {(mode === 0 || mode === 3) &&
                         <>
-                            <Row className="m-1 justify-content-center">Find two cards that match to win the Game</Row>
+                            <Row className="m-1 justify-content-center">{this.state.lang.desc}</Row>
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
-                                    <InputGroup>
-                                        <InputGroup.Text>Type:</InputGroup.Text>
+                                    <InputGroup className="flex-nowrap">
+                                        <InputGroup.Text>{this.state.lang.type}:</InputGroup.Text>
                                         <Form.Select aria-label="Source" name="imageType" xs="auto" value={this.state.imageType} onChange={this.handleInputChange.bind(this)}>
-                                            {IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{e}</option>)}
+                                            {/* {IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{e}</option>)} */
+                                                IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{this.state.lang.imagetypes[i] + ": " + e}</option>)
+                                            }
                                         </Form.Select>
                                         {this.state.imageType === '0' &&
                                             <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
@@ -327,8 +335,8 @@ class Game extends React.Component {
                             </Row>
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
-                                    <InputGroup>
-                                        <InputGroup.Text>Level:</InputGroup.Text>
+                                    <InputGroup className="flex-nowrap">
+                                        <InputGroup.Text>{this.state.lang.level}:</InputGroup.Text>
                                         <Form.Select className="w-50" aria-label="Cards" name="level" xs="auto" placeholder="Cards" value={this.state.level} onChange={this.handleInputChange.bind(this)}>
                                             {[...BOARD].map((e) =>
                                                 <option key={e[0]} value={e[0]}>
@@ -342,18 +350,18 @@ class Game extends React.Component {
                                     </InputGroup>
                                 </Col>
                             </Row>
-                            <Row className="m-1 align-items-center justify-content-center g-1">
+                            <Row className="m-1 align-items-center justify-content-center g-1 flex-nowrap">
                                 <Col xs="auto">
-                                    <Button onClick={this.handlePlayClick.bind(this)} >Play</Button>
+                                    <Button onClick={this.handlePlayClick.bind(this)}>{this.state.lang.play}</Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 4)} >Scores</Button>
+                                    <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 4)}>{this.state.lang.scores}</Button>
                                 </Col>
                             </Row>
                             {(mode === 0) &&
                                 <Row className="m-1 align-items-center justify-content-center g-1">
                                     <Col xs="auto">
-                                        {`Version ${version.buildMajor}.${version.buildMinor}.${version.buildRevision}`}
+                                        {this.state.lang.version}{` ${version.buildMajor}.${version.buildMinor}.${version.buildRevision}`}
                                     </Col>
                                 </Row>
                             }
@@ -361,21 +369,21 @@ class Game extends React.Component {
                     }
                     { // Game
                         (mode === 2) &&
-                        <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1">
+                        <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1 flex-nowrap">
                             <Col xs="auto">
-                                <Button className="" onClick={this.handleStopClick.bind(this)}>Stop</Button>
+                                <Button className="" onClick={this.handleStopClick.bind(this)}>{this.state.lang.stop}</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>New</Button>
+                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>{this.state.lang.new}</Button>
                             </Col>
                             <Col xs="auto">
                                 <Timer ref={this.Timer1} />
                             </Col>
                             <Col xs="auto">
-                                <Button variant="secondary" onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>Hint ({this.state.hintCount})</Button>
+                                <Button variant="secondary" onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>{this.state.lang.hint} ({this.state.hintCount})</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="secondary" onClick={this.handleShuffleClick.bind(this)}>Shuffle</Button>
+                                <Button variant="secondary" onClick={this.handleShuffleClick.bind(this)}>{this.state.lang.shuffle}</Button>
                             </Col>
                         </Row>
                     }
@@ -383,7 +391,7 @@ class Game extends React.Component {
                         (mode === 0 || mode === 1 || mode === 3) &&
                         <Row className="m-1 align-items-center justify-content-center">
                             {mode === 0 && this.state.errorMessage && <p className="text-danger">{this.state.errorMessage}</p>}
-                            {mode === 1 && `Loading images...`}
+                            {mode === 1 && `${this.state.lang.loadingmsg}`}
                         </Row>
                     }
                 </Form >
@@ -399,15 +407,15 @@ class Game extends React.Component {
                 { // Score table
                     mode === 4 &&
                     <>
-                        <Row className="m-1 justify-content-center">Score Table: {IMAGE_TYPES[this.state.imageType]}</Row>
+                        <Row className="m-1 justify-content-center">{this.state.lang.scoretable}: {IMAGE_TYPES[this.state.imageType]}</Row>
                         <Row className="m-1 justify-content-center"></Row>
                         <Row className="m-1 align-items-center justify-content-center g-1">
                             <Col xs="auto">
                                 <Table striped bordered size="sm">
                                     <thead>
                                         <tr>
-                                            <th>Level</th>
-                                            <th>Score</th>
+                                            <th>{this.state.lang.level}</th>
+                                            <th>{this.state.lang.score}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -427,31 +435,20 @@ class Game extends React.Component {
                         </Row>
                         <Row className="m-2 align-items-center justify-content-center g-1">
                             <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleClearClick.bind(this)}>Clear</Button>
+                                <Button variant="danger" onClick={this.handleClearClick.bind(this)}>{this.state.lang.clear}</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 0)}>Close</Button>
+                                <Button variant="secondary" onClick={this.handleScoresClick.bind(this, 0)}>{this.state.lang.close}</Button>
                             </Col>
                         </Row>
                     </>
                 }
-                <MyModal show={this.state.winModal} yes="Next level" no="Close" custom1="Replay"
-                    title={"Level " + this.state.level + " - Win!"}
+                <MyModal show={this.state.winModal} yes={this.state.lang.nextlevel} no={this.state.lang.close} custom1={this.state.lang.replay}
+                    title={this.state.lang.level + " " + this.state.level + " - " + `${this.state.lang.win}!`}
                     onNo={this.handleCloseModal.bind(this)}
                     onYes={this.handleNextLevel.bind(this)}
                     onCustom1={this.handlePlayClick.bind(this)}
                     body={<>
-                        <Row className="align-items-center justify-content-center">
-                            <Col xs="auto"><h4>
-                                {this.newScore === 10000 ?
-                                    TOP_WORDS[Math.floor(Math.random() * TOP_WORDS.length)] :
-                                    this.newScore > this.oldScore ?
-                                        GOOD_WORDS[Math.floor(Math.random() * GOOD_WORDS.length)] :
-                                        WIN_WORDS[Math.floor(Math.random() * WIN_WORDS.length)]
-                                }
-                            </h4>
-                            </Col>
-                        </Row>
                         <Row className="align-items-center justify-content-center">
                             <Col xs="5">
                                 {this.newScore === 10000 ? <Svgtext text="🏆" /> : this.newScore > this.oldScore && <Svgtext text="🏅" />}
@@ -462,24 +459,24 @@ class Game extends React.Component {
                                 <Table size="sm" borderless>
                                     <tbody>
                                         <tr>
-                                            <td>{this.newScore === 10000 ? "Top" : this.newScore > this.oldScore && "New High"} Score:</td>
+                                            <td>{this.newScore > this.oldScore ? this.state.lang.newhigh : this.state.lang.score}:</td>
                                             <td>{this.newScore}</td>
                                         </tr>
                                         <tr>
-                                            <td>{this.newScore > this.oldScore ? "Old" : "High"}  Score:</td>
+                                            <td>{this.state.lang.oldscore}:</td>
                                             <td>{this.oldScore}</td>
                                         </tr>
                                         <tr>
-                                            <td>Number of flips:</td><td>{this.successFlips + this.failureFlips}</td>
+                                            <td>{this.state.lang.numflips}:</td><td>{this.successFlips + this.failureFlips}</td>
                                         </tr>
                                         <tr className="align-items-center justify-content-center">
-                                            <td>Successful:</td><td>{this.successFlips}</td>
+                                            <td>{this.state.lang.successful}:</td><td>{this.successFlips}</td>
                                         </tr>
                                         <tr className="align-items-center justify-content-center">
-                                            <td>Failure:</td><td>{this.failureFlips}</td>
+                                            <td>{this.state.lang.failure}:</td><td>{this.failureFlips}</td>
                                         </tr>
                                         <tr className="align-items-center justify-content-center">
-                                            <td>Time spent:</td><td>{this.state.timerValue}</td>
+                                            <td>{this.state.lang.timespent}:</td><td>{this.state.timerValue}</td>
                                         </tr>
                                     </tbody>
                                 </Table>
@@ -487,7 +484,7 @@ class Game extends React.Component {
                         </Row>
                     </>}
                 />
-                <MyModal show={this.state.showModal} yes="Yes" no="No" title={this.state.modalTitle} body={this.state.modalBody} onYes={this.state.onModalYes} onNo={this.state.onModalNo} />
+                <MyModal show={this.state.showModal} yes={this.state.lang.yes} no={this.state.lang.no} title={this.state.modalTitle} body={this.state.modalBody} onYes={this.state.onModalYes} onNo={this.state.onModalNo} />
             </>
         );
     }

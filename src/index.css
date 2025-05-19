@@ -8,6 +8,7 @@ body {
   height: 100%;
   overscroll-behavior: none;
   user-select: none;
+  /* opacity: 0.05; */
 }
 
 body {
