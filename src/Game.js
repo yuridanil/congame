@@ -368,24 +368,29 @@ class Game extends React.Component {
                         </>
                     }
                     { // Game
-                        (mode === 2) &&
-                        <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1 flex-nowrap">
-                            <Col xs="auto">
-                                <Button className="" onClick={this.handleStopClick.bind(this)}>{this.state.lang.stop}</Button>
-                            </Col>
-                            <Col xs="auto">
-                                <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>{this.state.lang.new}</Button>
-                            </Col>
-                            <Col xs="auto">
-                                <Timer ref={this.Timer1} />
-                            </Col>
-                            <Col xs="auto">
-                                <Button variant="secondary" onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>{this.state.lang.hint} ({this.state.hintCount})</Button>
-                            </Col>
-                            <Col xs="auto">
-                                <Button variant="secondary" onClick={this.handleShuffleClick.bind(this)}>{this.state.lang.shuffle}</Button>
-                            </Col>
-                        </Row>
+                        (mode === 2) && <>
+                            <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1 flex-nowrap">
+                                <Col xs="auto">
+                                    <Button className="" onClick={this.handleStopClick.bind(this)}>{this.state.lang.stop}</Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button variant="danger" onClick={this.handleNewGameClick.bind(this)}>{this.state.lang.new}</Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button variant="secondary" onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>{this.state.lang.hint} ({this.state.hintCount})</Button>
+                                </Col>
+                            </Row>
+                            {/* <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1 flex-nowrap">
+                                <Col xs="auto">
+                                    <Button variant="secondary" onClick={this.handleShuffleClick.bind(this)}>{this.state.lang.shuffle}</Button>
+                                </Col>
+                            </Row> */}
+                            <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1 flex-nowrap">
+                                <Col xs="auto">
+                                    <Timer ref={this.Timer1} />
+                                </Col>
+                            </Row>
+                        </>
                     }
                     { // Status text
                         (mode === 0 || mode === 1 || mode === 3) &&
