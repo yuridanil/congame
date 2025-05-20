@@ -1,6 +1,11 @@
 {
-  "short_name": "Concentration Game",
-  "name": "Concentration Game",
+  "short_name": "Concentration",
+  "name": "Concentration",
+  "description": "Concentration Game. Find two cards that match to win the Game",
+  "start_url": "https://ydanilov.ru/congame",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
   "icons": [
     {
       "src": "favicon.ico",
@@ -17,9 +22,5 @@
       "type": "image/png",
       "sizes": "512x512"
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  ]
 }
