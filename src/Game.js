@@ -6,8 +6,7 @@ import MyModal from "./MyModal";
 import {
     BOARD, IMAGE_TYPES, ANIMALS, BASE_COLORS, DISTINCT16_COLORS,
     ENGLISH_LETTERS, RUSSIAN_LETTERS, NUMBERS, SYMBOLS, EMOJIS, FLAGS,
-    TOP_WORDS, GOOD_WORDS, WIN_WORDS,
-    SMILES, SHAPES
+    SMILES
 } from './Constants';
 import { cartesian, genSvg } from "./Utils";
 import Svgtext from "./Svgtext";
@@ -68,7 +67,6 @@ class Game extends React.Component {
             case '#6': chars = EMOJIS; colors = ['']; break;
             case '#7': chars = FLAGS; colors = ['']; break;
             case '#8': chars = SMILES; colors = ['']; break;
-            case '#9': chars = SHAPES; colors = BASE_COLORS; break;
             default: break;
         }
         switch (keyword) {
@@ -95,7 +93,6 @@ class Game extends React.Component {
             case '#6':
             case '#7':
             case '#8':
-            case '#9':
                 symbols = cartesian(chars, colors)
                     .sort(() => .5 - Math.random()) // choose random color letters
                     .slice(0, count) // cut if result contains more elements
@@ -154,7 +151,6 @@ class Game extends React.Component {
             case '6':
             case '7':
             case '8':
-            case '9':
                 keyword = `#${this.state.imageType}`
                 break;
             default:
@@ -190,10 +186,6 @@ class Game extends React.Component {
                 hintOn: hintTimeout
             }));
         }
-    }
-
-    handleShuffleClick() {
-        this.setState((prevState) => ({ cards: prevState.cards.sort(() => .5 - Math.random()) }));
     }
 
     handleInputChange(event) {
@@ -333,11 +325,9 @@ class Game extends React.Component {
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup className="flex-nowrap">
-                                        <InputGroup.Text>{this.state.lang.type}:</InputGroup.Text>
+                                        <InputGroup.Text>{this.state.lang.type}</InputGroup.Text>
                                         <Form.Select aria-label="Source" name="imageType" xs="auto" value={this.state.imageType} onChange={this.handleInputChange.bind(this)}>
-                                            {/* {IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{e}</option>)} */
-                                                IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{this.state.lang.imagetypes[i] + ": " + e}</option>)
-                                            }
+                                            {IMAGE_TYPES.map((e, i) => <option key={"imagetype" + i} value={i}>{this.state.lang.imagetypes[i] + ": " + e}</option>)}
                                         </Form.Select>
                                         {this.state.imageType === '0' &&
                                             <FormControl name="searchKeyword" xs="auto" placeholder="Search keyword" defaultValue={this.state.searchKeyword} onChange={this.handleInputChange.bind(this)} />
@@ -348,7 +338,7 @@ class Game extends React.Component {
                             <Row className="m-1 align-items-center justify-content-center">
                                 <Col xs="auto">
                                     <InputGroup className="flex-nowrap">
-                                        <InputGroup.Text>{this.state.lang.level}:</InputGroup.Text>
+                                        <InputGroup.Text>{this.state.lang.level}</InputGroup.Text>
                                         <Form.Select className="w-50" aria-label="Cards" name="level" xs="auto" placeholder="Cards" value={this.state.level} onChange={this.handleInputChange.bind(this)}>
                                             {[...BOARD].map((e) =>
                                                 <option key={e[0]} value={e[0]}>
@@ -392,11 +382,6 @@ class Game extends React.Component {
                                     <Button variant="secondary" onClick={this.handleHintClick.bind(this, 1000)} disabled={this.state.hintCount === 0 || this.state.hintOn !== null}>{this.state.lang.hint} ({this.state.hintCount})</Button>
                                 </Col>
                             </Row>
-                            {/* <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1 flex-nowrap">
-                                <Col xs="auto">
-                                    <Button variant="secondary" onClick={this.handleShuffleClick.bind(this)}>{this.state.lang.shuffle}</Button>
-                                </Col>
-                            </Row> */}
                             <Row className="mx-auto my-1 align-items-center justify-git add content-center g-1 flex-nowrap">
                                 <Col xs="auto">
                                     <Timer ref={this.Timer1} />
@@ -503,7 +488,7 @@ class Game extends React.Component {
                 />
                 <MyModal show={this.state.showModal} yes={this.state.lang.yes} no={this.state.lang.no} title={this.state.modalTitle} body={this.state.modalBody} onYes={this.state.onModalYes} onNo={this.state.onModalNo} />
                 {this.state.showImage && <div className="d-flex w-100 h-100 z-1000 position-absolute bg-white bg-opacity-75" onClick={this.handleImageClick.bind(this)}>
-                    <img id="fsImage" className="fsImage w-100 h-100" src={this.state.imageSrc}/>
+                    <img id="fsImage" className="fsImage w-100 h-100" src={this.state.imageSrc} alt=""/>
                 </div>}
             </>
         );
