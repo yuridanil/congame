@@ -13,6 +13,7 @@ import { cartesian, genSvg } from "./Utils";
 import Svgtext from "./Svgtext";
 import version from './version.json';
 import { Lang } from './Lang';
+import './Game.css';
 
 class Game extends React.Component {
     successFlips = 0;
@@ -34,7 +35,9 @@ class Game extends React.Component {
             winModal: false,
             showModal: false,
             errorMessage: null,
-            scores: JSON.parse(localStorage.getItem("scores") || '{}')
+            scores: JSON.parse(localStorage.getItem("scores") || '{}'),
+            showImage: false,
+            imageSrc: null
         };
         this.Timer1 = React.createRef();
         window.onresize = () => {
@@ -271,6 +274,9 @@ class Game extends React.Component {
     handleCardClick(id) {
         let cards = this.state.cards;
         let card = cards.find(e => e.id === id);
+        if (this.state.mode === 3) {
+            this.setState({ showImage: true, imageSrc: card.src });
+        };
         if (!card.flipped && this.state.flipped2 === null && this.state.hintOn === null) { // card not flipped and only one flipped yet in pair
             this.setFlipped(id, true);
             if (this.state.flipped1 === null) { // this is 1st card
@@ -312,6 +318,9 @@ class Game extends React.Component {
         }
     }
 
+    handleImageClick() {
+        this.setState({ showImage: false });
+    }
     render() {
         const mode = this.state.mode;
         return (
@@ -452,7 +461,7 @@ class Game extends React.Component {
                     </>
                 }
                 <MyModal show={this.state.winModal} yes={this.state.lang.nextlevel} no={this.state.lang.close} custom1={this.state.lang.replay}
-                    title={this.state.lang.level + " " + this.state.level + " - " + `${this.state.lang.win}!`}
+                    title={`${this.state.lang.level}  ${this.state.level} - ${this.state.lang.win}!`}
                     onNo={this.handleCloseModal.bind(this)}
                     onYes={this.handleNextLevel.bind(this)}
                     onCustom1={this.handlePlayClick.bind(this)}
@@ -493,6 +502,9 @@ class Game extends React.Component {
                     </>}
                 />
                 <MyModal show={this.state.showModal} yes={this.state.lang.yes} no={this.state.lang.no} title={this.state.modalTitle} body={this.state.modalBody} onYes={this.state.onModalYes} onNo={this.state.onModalNo} />
+                {this.state.showImage && <div className="d-flex w-100 h-100 z-1000 position-absolute bg-white bg-opacity-75" onClick={this.handleImageClick.bind(this)}>
+                    <img id="fsImage" className="fsImage w-100 h-100" src={this.state.imageSrc}/>
+                </div>}
             </>
         );
     }
